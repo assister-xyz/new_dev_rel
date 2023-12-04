@@ -43,7 +43,7 @@ export default function CustomTextField({
     <TextField
       onKeyDown={handleOnKeyDown}
       onChange={setResponseMessageHandler}
-      multiline
+      multiline={true}
       fullWidth
       minRows={1}
       maxRows={5}

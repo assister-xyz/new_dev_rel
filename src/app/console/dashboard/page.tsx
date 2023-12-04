@@ -69,6 +69,7 @@ export default function DashboardPage(): ReactElement {
     console.log("addTicketResponseMessageApiHandler runs");
 
     if (ticketId) {
+      // senderType is always "admin" from dev rel app
       const responseMessage: TicketResponseMessagesSchema = {
         senderType: "admin",
         message: message,
@@ -84,14 +85,17 @@ export default function DashboardPage(): ReactElement {
           throw new Error(responsePayload.result);
         }
 
-        // when no error, we will fetch the updated ticket again to update the ticket messages state
+        // ---------------------------------------------------------------------------------------------
+        // when no error, we will fetch the updated ticket object again and set new ticket messages state
         const getResponse: Response = await getTicketApi(ticketId);
+
         if (getResponse.ok === false) {
           const responsePayload: { result: string } = await getResponse.json();
           throw new Error(responsePayload.result);
         }
-        const responsePayload: { result: TicketSchema[] } = await getResponse.json();
-        setTargetTicketMessages(responsePayload.result[0].messages);
+
+        const responsePayload: { result: TicketSchema } = await getResponse.json();
+        setTargetTicketMessages(responsePayload.result.messages);
       } catch (error: unknown) {
         if (error instanceof Error) {
           alert(error.message);
@@ -109,8 +113,8 @@ export default function DashboardPage(): ReactElement {
         throw new Error(responsePayload.result);
       }
       // when no error, we process response payload then parse it to update the target ticket messages state
-      const responsePayload: { result: TicketSchema[] } = await getResponse.json();
-      setTargetTicketMessages(responsePayload.result[0].messages);
+      const responsePayload: { result: TicketSchema } = await getResponse.json();
+      setTargetTicketMessages(responsePayload.result.messages);
     } catch (error: unknown) {
       if (error instanceof Error) {
         alert(error.message);
@@ -169,8 +173,8 @@ export default function DashboardPage(): ReactElement {
       }
     }
 
-    // this auth loginCheckHandler will be conducted for all the protected page when navigated to + we handle client related data (only "clientName" so far) entirely here for simplicity
-    // we do not need to step state for client related date, but it is all stored in localStorage and we access from there directly
+    // this loginCheckHandler and if else will be conducted on every protected page route, so we can use this to check if client is logged in or not
+    // we do not need to use state for managing client related data, it is all stored in localStorage, and we can access directly from there
     const authCheckResult: string = loginCheckHandler();
     if (authCheckResult === "unauthorized") {
       navigationHandler("/", router);
