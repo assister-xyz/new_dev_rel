@@ -16,7 +16,7 @@ export async function getTicketApi(ticketId: string): Promise<Response> {
 }
 
 export async function addTicketResponseMessageApi(ticketId: string, message: TicketResponseMessagesSchema): Promise<Response> {
-  const response: Response = await fetch(`${DOMAIN}/api/ticket/${ticketId}/responses`, {
+  const response: Response = await fetch(`${DOMAIN}/api/ticket/${ticketId}/messages`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

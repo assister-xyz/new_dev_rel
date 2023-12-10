@@ -86,7 +86,7 @@ export default function DashboardPage(): ReactElement {
         }
 
         // ---------------------------------------------------------------------------------------------
-        // when no error, we will fetch the updated ticket object again and set new ticket messages state
+        // when no error, we will fetch the updated target ticket object again and set new ticket messages state
         const getResponse: Response = await getTicketApi(ticketId);
 
         if (getResponse.ok === false) {
