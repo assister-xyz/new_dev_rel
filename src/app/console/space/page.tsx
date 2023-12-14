@@ -1,6 +1,5 @@
 "use client";
 
-import DocCard from "@/components/FileCard";
 import { majorCardBgColor } from "@/themes/colors";
 import { loginCheckHandler } from "@/utils/auth";
 import { navigationHandler } from "@/utils/nav";
@@ -22,6 +21,7 @@ export default function SpacePage(): ReactElement {
   // -----------------------------------------------------------------------------------------------------------------
 
   function selectFileHandler(event: ChangeEvent<HTMLInputElement>): void {
+    // "?." is an optional chaining operator that prevents an error if files is undefined this does work on both js obj and array
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       const fileExtension: string = selectedFile.name.split(".").pop()!.toLowerCase();
@@ -39,6 +39,7 @@ export default function SpacePage(): ReactElement {
   async function uploadAndEmbedFileHandler(): Promise<void> {
     console.log("uploadAndEmbedFileHandler runs");
 
+    // this main logic of this function only runs if the selectedFile is not null (very important)
     if (selectedFile) {
       try {
         const fileType: string = selectedFile.name.split(".").pop()!.toLowerCase();

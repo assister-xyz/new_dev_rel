@@ -25,7 +25,7 @@ export default function DashboardPage(): ReactElement {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   // set initial state of client
-  const [selectedSource, setSelectedSource] = useState<string>("discord");
+  const [selectedSource, setSelectedSource]: [string, React.Dispatch<React.SetStateAction<string>>] = useState<string>("discord");
   // set the initial states for all cards, tickets, messages in this page
   const [ticketStatsCardStates, setTicketStatsCardStates] = useState<StatsCardStatesInterface>({ value: "--", percentChange: "--" });
   const [queryStatsCardStates, setQueryStatsCardStates] = useState<StatsCardStatesInterface>({ value: "--", percentChange: "--" });
