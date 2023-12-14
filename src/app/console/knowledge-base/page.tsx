@@ -165,74 +165,74 @@ export default function KnowladgeBasePage(): ReactElement {
             deleteTargetFileHandler={deleteTargetFileHandler} />
         ))}
       </Box>
-      <Box className='grid grid-cols-2'>
-        <Card>
-          <CardHeader className="space-y-0 pb-2">
-            <CardTitle className="flex justify-between text-sm font-medium">
-              Bot`s perfomance
-            </CardTitle>
-            <CardDescription>1,042 queries were solved this week.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Box className="grid gap-6">
-              <Box className="flex items-center justify-between space-x-4">
-                <Box className='rounded-full bg-[#D9D9D9] p-1'>
-                  <Image src='/logos/discord.png' alt='logo' width={32} height={32} />
-                </Box>
-                  <Box className='flex-1 ml-2'>
-                    <p className="text-sm font-medium leading-none">
-                      DS client
-                    </p>
-                    <p className="text-sm text-muted-foreground">queries</p>
-                  </Box>
-                  <p className="text-sm font-medium">
-                    {discordBotCardStates.openTicketsCount} tickets
-                  </p>
-                  <li
-                      style={{
-                        color: discordBotCardStates.isOnline ? greenLightColor : redLightColor,
-                      }}
-                  >
-                    {discordBotCardStates.isOnline ? 'online' : 'offline'}
-                  </li>
-              </Box>
-              <Box className="flex items-center justify-between space-x-4">
-                <Box className='rounded-full bg-[#D9D9D9] p-1'>
-                  <Image src='/logos/telegram.png' alt='logo' width={32} height={32} />
-                </Box>
-                <Box className='flex-1 ml-2'>
-                  <p className="text-sm font-medium leading-none">
-                    TG client
-                  </p>
-                  <p className="text-sm text-muted-foreground">queries</p>
-                </Box>
-                <p className="text-sm font-medium">
-                  {telegramBotCardStates.openTicketsCount} tickets
-                </p>
-                <li
-                  style={{
-                    color: telegramBotCardStates.isOnline ? greenLightColor : redLightColor,
-                  }}
-                >
-                  {telegramBotCardStates.isOnline ? 'online' : 'offline'}
-                </li>
-              </Box>
-              <Box className="flex items-center justify-between space-x-4">
-                <Box className='rounded-full bg-[#D9D9D9] p-1'>
-                  <Image src='/logos/main_site.png' alt='logo' width={32} height={32} />
-                </Box>
-                <Box className='flex-1 ml-2'>
-                  <p className="text-sm font-medium leading-none">
-                    Main Site
-                  </p>
-                  <p className="text-sm text-muted-foreground">queries</p>
-                </Box>
-                <Button variant="secondary">Set Up</Button>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
+      {/*<Box className='grid gap-6 grid-cols-2'>*/}
+      {/*  <Card>*/}
+      {/*    <CardHeader className="space-y-0 pb-2">*/}
+      {/*      <CardTitle className="flex justify-between text-sm font-medium">*/}
+      {/*        Bot`s perfomance*/}
+      {/*      </CardTitle>*/}
+      {/*      <CardDescription>1,042 queries were solved this week.</CardDescription>*/}
+      {/*    </CardHeader>*/}
+      {/*    <CardContent>*/}
+      {/*      <Box className="grid gap-6">*/}
+      {/*        <Box className="flex items-center justify-between space-x-4">*/}
+      {/*          <Box className='rounded-full bg-[#D9D9D9] p-1'>*/}
+      {/*            <Image src='/logos/discord.png' alt='logo' width={32} height={32} />*/}
+      {/*          </Box>*/}
+      {/*            <Box className='flex-1 ml-2'>*/}
+      {/*              <p className="text-sm font-medium leading-none">*/}
+      {/*                DS client*/}
+      {/*              </p>*/}
+      {/*              <p className="text-sm text-muted-foreground">queries</p>*/}
+      {/*            </Box>*/}
+      {/*            <p className="text-sm font-medium">*/}
+      {/*              {discordBotCardStates.openTicketsCount} tickets*/}
+      {/*            </p>*/}
+      {/*            <li*/}
+      {/*                style={{*/}
+      {/*                  color: discordBotCardStates.isOnline ? greenLightColor : redLightColor,*/}
+      {/*                }}*/}
+      {/*            >*/}
+      {/*              {discordBotCardStates.isOnline ? 'online' : 'offline'}*/}
+      {/*            </li>*/}
+      {/*        </Box>*/}
+      {/*        <Box className="flex items-center justify-between space-x-4">*/}
+      {/*          <Box className='rounded-full bg-[#D9D9D9] p-1'>*/}
+      {/*            <Image src='/logos/telegram.png' alt='logo' width={32} height={32} />*/}
+      {/*          </Box>*/}
+      {/*          <Box className='flex-1 ml-2'>*/}
+      {/*            <p className="text-sm font-medium leading-none">*/}
+      {/*              TG client*/}
+      {/*            </p>*/}
+      {/*            <p className="text-sm text-muted-foreground">queries</p>*/}
+      {/*          </Box>*/}
+      {/*          <p className="text-sm font-medium">*/}
+      {/*            {telegramBotCardStates.openTicketsCount} tickets*/}
+      {/*          </p>*/}
+      {/*          <li*/}
+      {/*            style={{*/}
+      {/*              color: telegramBotCardStates.isOnline ? greenLightColor : redLightColor,*/}
+      {/*            }}*/}
+      {/*          >*/}
+      {/*            {telegramBotCardStates.isOnline ? 'online' : 'offline'}*/}
+      {/*          </li>*/}
+      {/*        </Box>*/}
+      {/*        <Box className="flex items-center justify-between space-x-4">*/}
+      {/*          <Box className='rounded-full bg-[#D9D9D9] p-1'>*/}
+      {/*            <Image src='/logos/main_site.png' alt='logo' width={32} height={32} />*/}
+      {/*          </Box>*/}
+      {/*          <Box className='flex-1 ml-2'>*/}
+      {/*            <p className="text-sm font-medium leading-none">*/}
+      {/*              Main Site*/}
+      {/*            </p>*/}
+      {/*            <p className="text-sm text-muted-foreground">queries</p>*/}
+      {/*          </Box>*/}
+      {/*          <Button variant="secondary">Set Up</Button>*/}
+      {/*        </Box>*/}
+      {/*      </Box>*/}
+      {/*    </CardContent>*/}
+      {/*  </Card>*/}
+      {/*</Box>*/}
     </Box>
   );
 }

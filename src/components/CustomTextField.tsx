@@ -59,8 +59,8 @@ export default function CustomTextField({
           </InputAdornment>
         ),
         sx: {
-          bgcolor: cardBgColor,
-          borderRadius: "15px", // Adjust border radius as per the screenshot
+          bgcolor: '#F7F9FB',
+          borderRadius: "8px", // Adjust border radius as per the screenshot
         },
       }}
       sx={{
