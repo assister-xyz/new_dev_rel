@@ -15,6 +15,7 @@ export async function getTicketApi(ticketId: string): Promise<Response> {
   return response;
 }
 
+// only for dev rel admin
 export async function addTicketResponseMessageApi(ticketId: string, message: TicketResponseMessagesSchema): Promise<Response> {
   const response: Response = await fetch(`${DOMAIN}/api/ticket/${ticketId}/messages`, {
     method: "PUT",
