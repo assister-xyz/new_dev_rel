@@ -29,6 +29,7 @@ export interface TicketMessagesSchema {
   ticketId: string;
   id: string;
   createdDate: string;
+  createdDatetime?: string;
 }
 
 export interface TicketResponseMessagesSchema {
@@ -38,17 +39,14 @@ export interface TicketResponseMessagesSchema {
 }
 
 export interface DashBoardDataSchema {
-  source_open_tickets: TicketSchemaWithoutMessages[];
-  source_total_tickets_count: string;
-  source_total_queries_count: string;
-  source_weekly_unique_user_count: string;
-  source_daily_unique_user_count: string;
-  source_daily_tickets_percentage_change: string;
-  source_daily_queries_percentage_change: string;
-  source_weekly_unique_user_percentage_change: string;
-  source_daily_unique_user_percentage_change: string;
-  discord_open_tickets_count: string;
-  discord_most_recent_query_datetime: string;
-  telegram_most_recent_query_datetime: string;
-  telegram_open_tickets_count: string;
+  current_period_unique_user_count: string;
+  current_period_total_queries_count: string;
+  current_period_total_open_ticket_count: string;
+  current_period_ticket_response_time: string;
+  queries_percent_change: string;
+  open_tickets_percent_change: string;
+  unique_user_percent_change: string;
+  ticket_response_time_percent_change: string;
+  ai_success_rate: string;
+  ai_time_saved: string;
 }

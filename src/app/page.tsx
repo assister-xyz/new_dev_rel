@@ -30,8 +30,9 @@ export default function AuthPage(): ReactElement {
       }
       // if login is successful we will store the client name in localStorage (value come from server) + navigate to dashboard after 500ms
       const responsePayload: { result: string } = await postResponse.json();
-
       localStorage.setItem("client", responsePayload.result);
+
+      // we then navigate to dashboard after 500ms
       setTimeout(() => {
         navigationHandler("/console/dashboard", router);
       }, 500);
@@ -45,6 +46,7 @@ export default function AuthPage(): ReactElement {
   // ------------------------------------------------------------------------------------------------------------------------------------------------
 
   useEffect(() => {
+    // if client is already logged in (if client name is stored in localstorage), we redirect him to the dashboard page directly by skipping the login page
     if (localStorage.getItem("client")) {
       navigationHandler("/console/dashboard", router);
     }
@@ -122,23 +124,23 @@ export default function AuthPage(): ReactElement {
                   },
                 }}
               />
-              <Box
-                width={"100%"}
-                component={"button"}
-                type='submit'
-                bgcolor={"black"}
-                padding={"10px"}
-                borderRadius={"15px"}
-                border={"none"}
-                marginBottom={"70px"}
-                sx={{
-                  "&:hover": {
-                    cursor: "pointer",
-                    opacity: 0.8,
-                  },
-                }}
-              >
-                <Typography variant='h3' textAlign={"center"} color={"white"}>
+              <Box component={"button"} type='submit' width={"100%"}>
+                <Typography
+                  padding={"10px"}
+                  borderRadius={"15px"}
+                  border={"none"}
+                  marginBottom={"70px"}
+                  variant='h3'
+                  textAlign={"center"}
+                  color={"white"}
+                  bgcolor={"black"}
+                  sx={{
+                    "&:hover": {
+                      cursor: "pointer",
+                      opacity: 0.8,
+                    },
+                  }}
+                >
                   Authenticate
                 </Typography>
               </Box>

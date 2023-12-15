@@ -1,6 +1,6 @@
 "use client";
 
-import {greenLightColor, majorCardBgColor, redLightColor} from "@/themes/colors";
+import { greenLightColor, majorCardBgColor, redLightColor } from "@/themes/colors";
 import { loginCheckHandler } from "@/utils/auth";
 import { navigationHandler } from "@/utils/nav";
 import { Box, Grid, Typography } from "@mui/material";
@@ -8,35 +8,17 @@ import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {EmbeddedFileStatesInterface, SourceBotCardStatesInterface} from "@/types/states";
-import { deleteEmbeddedFileApi, embeddAndStoreFileApi, getEmbeddedFilesApi } from "@/apis/spacePage";
+import { EmbeddedFileStatesInterface, SourceBotCardStatesInterface } from "@/types/states";
+import { deleteEmbeddedFileApi, embeddAndStoreFileApi, getEmbeddedFileRefsApi } from "@/apis/spacePage";
 import FileCard from "@/components/FileCard";
 import AddFileCard from "@/components/AddFileCard";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function KnowladgeBasePage(): ReactElement {
-  const router: AppRouterInstance = useRouter();
-
   const [selectedFile, setSelectedFileFile] = useState<File | null>(null);
   const [isFileTypeError, setIsFileTypeError] = useState<boolean>(false);
   const [filesData, setFilesData] = useState<EmbeddedFileStatesInterface[]>([]);
-
-  const [discordBotCardStates, setDiscordBotCardStates] = useState<SourceBotCardStatesInterface>({
-    lastQueryDatetime: "--",
-    isOnline: false,
-    openTicketsCount: "--",
-  });
-  const [telegramBotCardStates, setTelegramBotCardStates] = useState<SourceBotCardStatesInterface>({
-    lastQueryDatetime: "--",
-    isOnline: false,
-    openTicketsCount: "--",
-  });
-  const [mainSiteBotCardStates, setMainSiteBotCardStates] = useState<SourceBotCardStatesInterface>({
-    lastQueryDatetime: "--",
-    isOnline: false,
-    openTicketsCount: "--",
-  });
 
   // -----------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +56,7 @@ export default function KnowladgeBasePage(): ReactElement {
         setSelectedFileFile(null);
         setIsFileTypeError(false);
 
-        const getResponse: Response = await getEmbeddedFilesApi(client);
+        const getResponse: Response = await getEmbeddedFileRefsApi(client);
         if (getResponse.ok === false) {
           const responsePayload: { result: string } = await getResponse.json();
           throw new Error(responsePayload.result);
@@ -100,7 +82,7 @@ export default function KnowladgeBasePage(): ReactElement {
         throw new Error(responsePayload.result);
       }
 
-      const getResponse: Response = await getEmbeddedFilesApi(client);
+      const getResponse: Response = await getEmbeddedFileRefsApi(client);
       if (getResponse.ok === false) {
         const responsePayload: { result: string } = await getResponse.json();
         throw new Error(responsePayload.result);
@@ -122,7 +104,7 @@ export default function KnowladgeBasePage(): ReactElement {
   //     console.log("getEmbeddedFilesOnNav runs");
   //
   //     try {
-  //       const getResponse: Response = await getEmbeddedFilesApi(client);
+  //       const getResponse: Response = await getEmbeddedFileRefsApi(client);
   //       if (getResponse.ok === false) {
   //         const responsePayload: { result: string } = await getResponse.json();
   //         throw new Error(responsePayload.result);
@@ -148,21 +130,14 @@ export default function KnowladgeBasePage(): ReactElement {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
-    <Box className="flex-1 space-y-4 p-8 pt-6">
-      <Box className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Knowledge Base</h2>
+    <Box className='flex-1 space-y-4 p-8 pt-6'>
+      <Box className='flex items-center justify-between space-y-2'>
+        <h2 className='text-3xl font-bold tracking-tight'>Knowledge Base</h2>
       </Box>
-      <Box className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <AddFileCard
-          fileName={selectedFile?.name}
-          uploadAndEmbedFileHandler={uploadAndEmbedFileHandler}
-          selectFileHandler={selectFileHandler}
-        />
+      <Box className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        <AddFileCard fileName={selectedFile?.name} uploadAndEmbedFileHandler={uploadAndEmbedFileHandler} selectFileHandler={selectFileHandler} />
         {filesData.map((file: EmbeddedFileStatesInterface, index: number) => (
-          <FileCard
-            key={index}
-            {...file}
-            deleteTargetFileHandler={deleteTargetFileHandler} />
+          <FileCard key={index} {...file} deleteTargetFileHandler={deleteTargetFileHandler} />
         ))}
       </Box>
       {/*<Box className='grid gap-6 grid-cols-2'>*/}

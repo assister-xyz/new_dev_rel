@@ -1,28 +1,16 @@
 import { DOMAIN } from "@/constants/domains";
 import { TicketResponseMessagesSchema } from "@/types/apiResponseSchema";
 
-export async function getDashBoardDataApi(source: string, client: string): Promise<Response> {
-  const response: Response = await fetch(`${DOMAIN}/api/dashboard/?source=${source}&client=${client}`, {
+export async function getDashBoardStatsCardDataApi(period: string, clientName: string): Promise<Response> {
+  const response: Response = await fetch(`${DOMAIN}/api/dashboard/stats/?period=${period}&client-name=${clientName}`, {
     method: "GET",
   });
   return response;
 }
 
-export async function getTicketApi(ticketId: string): Promise<Response> {
-  const response: Response = await fetch(`${DOMAIN}/api/ticket/${ticketId}`, {
+export async function getDashBoardFAQInsightApi(clientName: string): Promise<Response> {
+  const response: Response = await fetch(`${DOMAIN}/api/dashboard/insights/faq/?client-name=${clientName}`, {
     method: "GET",
-  });
-  return response;
-}
-
-// only for dev rel admin
-export async function addTicketResponseMessageApi(ticketId: string, message: TicketResponseMessagesSchema): Promise<Response> {
-  const response: Response = await fetch(`${DOMAIN}/api/ticket/${ticketId}/messages`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
   });
   return response;
 }

@@ -1,10 +1,8 @@
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
 import { ReactElement, useState } from "react";
-import { cardBgColor } from "@/themes/colors";
 
 export default function CustomTextField({
   ticketId,
@@ -59,7 +57,7 @@ export default function CustomTextField({
           </InputAdornment>
         ),
         sx: {
-          bgcolor: '#F7F9FB',
+          bgcolor: "#F7F9FB",
           borderRadius: "8px", // Adjust border radius as per the screenshot
         },
       }}

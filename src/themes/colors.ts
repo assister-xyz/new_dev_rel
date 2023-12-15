@@ -9,3 +9,6 @@ export const messageBubbleBgColor: string = "#E5ECF6";
 export const majorCardBgColor: string = "#FFF0E5";
 export const docCardColor: string = "#FFE1CC";
 export const warningColor: string = "#FF6B00";
+
+export const primaryThemeColor: string = "#DB5F94";
+export const secondaryThemeColor: string = "#ECBDE6";

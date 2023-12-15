@@ -1,50 +1,66 @@
 "use client";
 
-import React, {ReactElement, useEffect, useRef, useState} from "react";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import {DataTable} from "@/components/table/DataTable";
-import {columns} from "@/components/table/Columns";
+import { DataTable } from "@/components/table/DataTable";
+import { columns } from "@/components/table/Columns";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import MessageCard from "@/components/MessageCard";
 import CustomTextField from "@/components/CustomTextField";
-import {
-  DashBoardDataSchema,
-  TicketMessagesSchema,
-  TicketResponseMessagesSchema,
-  TicketSchema, TicketSchemaWithoutMessages
-} from "@/types/apiResponseSchema";
-import {addTicketResponseMessageApi, getDashBoardDataApi, getTicketApi} from "@/apis/dashboardPage";
-import {loginCheckHandler} from "@/utils/auth";
-import {navigationHandler} from "@/utils/nav";
-import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {useRouter} from "next/navigation";
+import { TicketMessagesSchema, TicketResponseMessagesSchema, TicketSchema, TicketSchemaWithoutMessages } from "@/types/apiResponseSchema";
+import { addTicketResponseMessageApi, getOpenTicketsBySourceApi, getTicketApi } from "@/apis/ticketPage";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { borderColor } from "@/themes/colors";
 
 export default function TicketsPage(): ReactElement {
-  const router: AppRouterInstance = useRouter();
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  // set initial state
+
   const [selectedSource, setSelectedSource] = useState<string>("discord");
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPage, setTotalPage] = useState<number>(1);
+
   const [targetTicketMessages, setTargetTicketMessages] = useState<TicketMessagesSchema[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
+  const [tableData, setTableData] = useState<{ id: string; user: string; task: string; status: string }[]>([]);
+
+  // ----------------------------------------------------------------------------------------------------------------------------
+
+  function goToNextPageHandler(): void {
+    if (currentPage < totalPage) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  }
+
+  function goToPreviousPageHandler(): void {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }
+
+  function setSelectedSourceHandler(targetSource: string): void {
+    setSelectedSource(targetSource);
+    setCurrentPage(1);
+  }
 
   function scrollToBottom(): void {
     messagesContainerRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
-  async function addTicketResponseMessageApiHandler(ticketId: string | undefined, message: string): Promise<void> {
+  async function addTicketResponseMessageApiHandler(ticketId: string | undefined, messageContent: string): Promise<void> {
     console.log("addTicketResponseMessageApiHandler runs");
 
     if (ticketId) {
       // senderType is always "admin" from dev rel app
-      const responseMessage: TicketResponseMessagesSchema = {
+      const adminResponse: TicketResponseMessagesSchema = {
         senderType: "admin",
-        message: message,
+        message: messageContent,
         ticketId: ticketId,
       };
 
       try {
         // add response message to the target ticket
-        const putResponse: Response = await addTicketResponseMessageApi(ticketId, responseMessage);
+        const putResponse: Response = await addTicketResponseMessageApi(ticketId, adminResponse);
         // response.ok is a shorthand property that returns a boolean indicating whether the response was successful (true, 200-299 it indicates a successful response | false is not successful)
         if (putResponse.ok === false) {
           const responsePayload: { result: string } = await putResponse.json();
@@ -73,6 +89,7 @@ export default function TicketsPage(): ReactElement {
   async function getTicketApiHandler(ticketId: string): Promise<void> {
     try {
       const getResponse: Response = await getTicketApi(ticketId);
+
       if (getResponse.ok === false) {
         const responsePayload: { result: string } = await getResponse.json();
         throw new Error(responsePayload.result);
@@ -88,30 +105,30 @@ export default function TicketsPage(): ReactElement {
   }
 
   useEffect(() => {
-    // fetching analytics data and tickets based on client and source (conduct when dashboard page is navigated to + when source is changed)
-    async function getDashboardDataHandler(source: string, client: string): Promise<void> {
-      console.log("getDashboardDataHandler runs");
-      console.log("client:", client);
+    async function getOpenTicketsByPageApiHandler(source: string, clientName: string, page: number): Promise<void> {
+      console.log("getOpenTicketsByPageApiHandler runs");
 
       try {
-        const getResponse: Response = await getDashBoardDataApi(source, client);
+        const getResponse: Response = await getOpenTicketsBySourceApi(source, clientName, page);
         if (getResponse.ok === false) {
           const responsePayload: { result: string } = await getResponse.json();
           throw new Error(responsePayload.result);
         }
-        // when no error, we process response payload then parse --> update all states using the response payload
 
-        const responsePayload: { result: DashBoardDataSchema } = await getResponse.json();
+        const responsePayload: { result: { page_tickets: TicketSchemaWithoutMessages[]; total_pages: number } } = await getResponse.json();
 
-        setTableData(responsePayload.result.source_open_tickets.map(ticket => {
-          return {
-            id: ticket.id,
-            user: ticket.username,
-            task: ticket.request,
-            status: ticket.status
-          }
-        }))
+        setTotalPage(responsePayload.result.total_pages);
 
+        setTableData(
+          responsePayload.result.page_tickets.map((ticket: TicketSchemaWithoutMessages) => {
+            return {
+              id: ticket.id,
+              user: ticket.username,
+              task: ticket.request,
+              status: ticket.status,
+            };
+          })
+        );
       } catch (error: unknown) {
         if (error instanceof Error) {
           alert(error.message);
@@ -119,30 +136,106 @@ export default function TicketsPage(): ReactElement {
       }
     }
 
-    // this loginCheckHandler and if else will be conducted on every protected page route, so we can use this to check if client is logged in or not
-    // we do not need to use state for managing client related data, it is all stored in localStorage, and we can access directly from there
-    const authCheckResult: string = loginCheckHandler();
-    if (authCheckResult === "unauthorized") {
-      navigationHandler("/", router);
-    } else {
-      const clientName: string = localStorage.getItem("client")!;
-      console.log("client:", clientName);
-      getDashboardDataHandler(selectedSource, clientName);
+    const clientName: string | null = localStorage.getItem("client");
+    if (clientName) {
+      getOpenTicketsByPageApiHandler(selectedSource, clientName, currentPage);
     }
-  }, [selectedSource]);
+  }, [selectedSource, currentPage]);
 
   useEffect(() => {
     scrollToBottom();
   }, [targetTicketMessages]);
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   return (
-    <Box className="flex-1 space-y-4 p-8 pt-6">
-      <Box className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Tickets</h2>
+    <Box className='flex-1 space-y-4 p-8 pt-6'>
+      <Box className='flex items-center justify-between space-y-2'>
+        <h2 className='text-3xl font-bold tracking-tight'>Tickets</h2>
       </Box>
       <Box className='grid gap-4 grid-cols-3'>
         <Box className='col-span-2'>
-          <DataTable  data={tableData} columns={columns} getTicketApiHandler={getTicketApiHandler}/>
+          <Box display={"flex"} marginBottom={"15px"}>
+            <Box
+              onClick={() => setSelectedSourceHandler("discord")}
+              paddingX={"15px"}
+              paddingY={"10px"}
+              bgcolor={selectedSource === "discord" ? "black" : ""}
+              borderRadius={"15px"}
+              border={1}
+              display={"inline-block"}
+              marginRight={"15px"}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                  opacity: "0.8",
+                },
+              }}
+            >
+              <Typography variant='h6' color={selectedSource === "discord" ? "white" : "black"} component={"span"}>
+                Discord
+              </Typography>
+            </Box>
+            <Box
+              onClick={() => setSelectedSourceHandler("telegram")}
+              paddingX={"15px"}
+              paddingY={"10px"}
+              bgcolor={selectedSource === "telegram" ? "black" : ""}
+              borderRadius={"15px"}
+              border={1}
+              display={"inline-block"}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                  opacity: "0.8",
+                },
+              }}
+            >
+              <Typography variant='h6' color={selectedSource === "telegram" ? "white" : "black"} component={"span"}>
+                Telegram
+              </Typography>
+            </Box>
+          </Box>
+
+          <DataTable data={tableData} columns={columns} getTicketApiHandler={getTicketApiHandler} />
+
+          <Box display={"flex"} justifyContent={"flex-end"} marginTop={"20px"} alignItems={"center"}>
+            <Box
+              onClick={goToPreviousPageHandler}
+              padding={"4px 10px 7px 10px"}
+              border={2}
+              borderRadius={"10px"}
+              borderColor={borderColor}
+              marginRight={"15px"}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                  backgroundColor: "#F1F5F9",
+                },
+              }}
+            >
+              <ArrowBackIosNewIcon sx={{ fontSize: "16px" }} />
+            </Box>
+            <Typography variant='h6'>
+              Page {totalPage !== 0 ? currentPage : 0} of {totalPage}
+            </Typography>
+            <Box
+              onClick={goToNextPageHandler}
+              padding={"4px 10px 7px 10px"}
+              border={2}
+              borderRadius={"10px"}
+              borderColor={borderColor}
+              marginLeft={"15px"}
+              sx={{
+                "&:hover": {
+                  cursor: "pointer",
+                  backgroundColor: "#F1F5F9",
+                },
+              }}
+            >
+              <ArrowForwardIosIcon sx={{ fontSize: "16px" }} />
+            </Box>
+          </Box>
         </Box>
         {/* Ticket response containers */}
         <Box width={"100%"}>
@@ -150,7 +243,7 @@ export default function TicketsPage(): ReactElement {
             display={"flex"}
             sx={{
               border: 1,
-              borderColor: '#1C1C1C1A',
+              borderColor: "#1C1C1C1A",
               borderTopLeftRadius: "8px",
               borderTopRightRadius: "8px",
             }}
@@ -170,7 +263,7 @@ export default function TicketsPage(): ReactElement {
               borderTop: 0,
               borderBottomRightRadius: "8px",
               borderBottomLeftRadius: "8px",
-              borderColor: '#1C1C1C1A',
+              borderColor: "#1C1C1C1A",
             }}
           >
             <Box

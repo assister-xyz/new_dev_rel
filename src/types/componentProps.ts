@@ -2,7 +2,7 @@ import exp from "constants";
 import { EmbeddedFileStatesInterface } from "./states";
 
 export interface StatsCardPropsInterface {
-  statsIcon: string;
+  statsIconPath: string;
   statsName: string;
   value: string;
   percentChange?: string;

@@ -1,7 +1,6 @@
 import { DOMAIN } from "@/constants/domains";
 
 export async function embeddAndStoreFileApi({ client, selectedFile, fileType }: { selectedFile: File; client: string; fileType: string }): Promise<Response> {
-  console.log("embeddAndStoreFileApir runs");
   const fileFormData = new FormData();
   fileFormData.append("file", selectedFile);
 
@@ -15,7 +14,7 @@ export async function embeddAndStoreFileApi({ client, selectedFile, fileType }: 
 
 // ------------------------------------------------------------------------------------------------------------
 
-export async function getEmbeddedFilesApi(client: string): Promise<Response> {
+export async function getEmbeddedFileRefsApi(client: string): Promise<Response> {
   const response: Response = await fetch(`${DOMAIN}/api/file/?client-name=${client}`, {
     method: "GET",
   });
@@ -24,8 +23,8 @@ export async function getEmbeddedFilesApi(client: string): Promise<Response> {
 
 // ------------------------------------------------------------------------------------------------------------
 
-export async function deleteEmbeddedFileApi(id: string): Promise<Response> {
-  const response: Response = await fetch(`${DOMAIN}/api/file/?file-id=${id}`, {
+export async function deleteEmbeddedFileApi(fileId: string): Promise<Response> {
+  const response: Response = await fetch(`${DOMAIN}/api/file/?file-id=${fileId}`, {
     method: "DELETE",
   });
   return response;
