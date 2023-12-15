@@ -1,15 +1,18 @@
 "use client";
 
-import MenuItem from "@/components/MenuItem";
-import { borderColor, textSecondaryColor } from "@/themes/colors";
+import React, { ReactElement, useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Box, Typography } from "@mui/material";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+
+import bgImage from "../../../public/imgs/bg.svg";
+import logoImage from "../../../public/imgs/logo.svg";
 import { loginCheckHandler } from "@/utils/auth";
 import { capitalizeFirstLetter } from "@/utils/general";
 import { navigationHandler } from "@/utils/nav";
-import { Box, Typography } from "@mui/material";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { ReactElement, useEffect, useState } from "react";
+import {UserNavigation} from "@/components/navigation/UserNavigation";
+import {MainNavigation} from "@/components/navigation/MainNavigation";
 
 // this layout is rendered for all pages navigation under the "/console"
 export default function ConsoleLayout({ children }: { children: ReactElement }): ReactElement {
@@ -36,46 +39,41 @@ export default function ConsoleLayout({ children }: { children: ReactElement }):
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     // the overall main flex container box for all console routes
-    <Box display={"flex"} justifyContent={"flex-start"} alignItems={"flex-start"} width={"100%"}>
-      {/* left-side vertical bar */}
-      <Box
-        height={"100vh"}
-        display={"flex"}
-        flexDirection={"column"}
-        sx={{
-          borderRight: 2,
-          borderColor: borderColor,
-        }}
-      >
-        {/* ---------------------------------------------------------------------------------------------------------------- */}
-        {/* assisterr logs section */}
-        <Box marginTop={"40px"} marginX={"35px"}>
-          <Image src={"/imgs/assisterr.png"} width={150} height={30} alt='assisterr logos' quality={100} />
+    <Box className='relative h-full'>
+      {/* this is for background back layer image */}
+      <Box className='absolute left-[50%] -z-10 translate-x-[-50%]'>
+        <Box className='h-[230px] w-[800px]'>
+          <Image src={bgImage} alt='assisterr logo' fill priority />
         </Box>
-        {/* ---------------------------------------------------------------------------------------------------------------- */}
-        {/* assisterr logs section */}
-        <Box>
-          <Typography variant={"h6"} marginX={"35px"} marginTop={"20px"} marginBottom={"10px"} textAlign={"center"}>
-            {capitalizeFirstLetter(targetClient)}
-          </Typography>
-        </Box>
-
-        {/* ---------------------------------------------------------------------------------------------------------------- */}
-        {/* menu items section */}
-        <Box display={"flex"} flexDirection={"column"} marginX={"10px"} paddingTop={"140px"} paddingBottom={"80px"} justifyContent={"space-between"} flexGrow={1}>
-          {/* uppper menu items */}
-          <Box>
-            <MenuItem name={"Dashboard"} iconPath={"/logos/dashboard.png"} marginB='10px' selectedMenuItem={selectedMenuItem} selectMenuItemHandler={selectMenuItemHandler} />
-            <MenuItem name={"Space"} iconPath={"/logos/space.png"} marginB='10px' selectedMenuItem={selectedMenuItem} selectMenuItemHandler={selectMenuItemHandler} />
-            <MenuItem name={"Support"} iconPath={"/logos/support.png"} marginB='10px' selectedMenuItem={selectedMenuItem} selectMenuItemHandler={selectMenuItemHandler} />
+      </Box>
+      {/* ------------------------------------------------------------------------------------------------------ */}
+      {/* assisterr logo section */}
+      <Box className='ml-10 pt-5'>
+        <Image src={logoImage} alt='assisterr logo' width={130} height={23}/>
+        <Typography variant={"h6"} marginY={"10px"} textAlign={"left"}>
+          {capitalizeFirstLetter(targetClient)}
+        </Typography>
+      </Box>
+      {/* ------------------------------------------------------------------------------------------------------ */}
+      <Box className='overflow-hidden rounded-[0.5rem] border shadow m-5'>
+        <Box className="flex-col md:flex">
+          {/* MainNavigation component */}
+          <Box className="border-b">
+            <Box className="flex h-16 items-center px-4">
+              <MainNavigation className="mx-6" />
+              {/* MainNavigation component */}
+              <Box className="ml-auto flex items-center space-x-4">
+                <UserNavigation />
+              </Box>
+              {/* ------------------------------------------------------------------------------------------------------ */}
+            </Box>
           </Box>
-          {/* lower menu items */}
-          <Box>
-            <MenuItem name={"Log out"} iconPath={"/logos/organization.png"} marginB='10px' selectedMenuItem={selectedMenuItem} selectMenuItemHandler={selectMenuItemHandler} />
+          {/* ------------------------------------------------------------------------------------------------------ */}
+          <Box className='min-h-[500px]'>
+            {children}
           </Box>
         </Box>
       </Box>
-      <>{children}</>
     </Box>
   );
 }

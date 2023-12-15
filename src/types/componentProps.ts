@@ -5,7 +5,7 @@ export interface StatsCardPropsInterface {
   statsIcon: string;
   statsName: string;
   value: string;
-  percentChange: string;
+  percentChange?: string;
 }
 
 export interface SourceBotCardPropsInterface {

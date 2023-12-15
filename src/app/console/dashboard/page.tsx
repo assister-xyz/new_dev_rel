@@ -1,15 +1,8 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import React, { ReactElement, use, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import StatsCard from "@/components/StatsCard";
-import { borderColor, cardBgColor } from "@/themes/colors";
-import TicketItem from "@/components/TicketItem";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import CustomTextField from "@/components/CustomTextField";
-import MessageCard from "@/components/MessageCard";
-import SourceBotCard from "@/components/SourceBotCard";
 import { addTicketResponseMessageApi, getDashBoardDataApi, getTicketApi } from "@/apis/dashboardPage";
 import { DashBoardDataSchema, TicketMessagesSchema, TicketResponseMessagesSchema, TicketSchema, TicketSchemaWithoutMessages } from "@/types/apiResponseSchema";
 import { SourceBotCardStatesInterface, StatsCardStatesInterface } from "@/types/states";
@@ -17,6 +10,10 @@ import { loginCheckHandler } from "@/utils/auth";
 import { navigationHandler } from "@/utils/nav";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Separator} from "@/components/ui/separator";
+import {Button} from "@/components/ui/button";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 
 export default function DashboardPage(): ReactElement {
   const router: AppRouterInstance = useRouter();
@@ -191,151 +188,52 @@ export default function DashboardPage(): ReactElement {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
-    // dashboard overall Box container
-    <Box width={"100%"} paddingTop={"50px"} paddingBottom={"30px"} paddingX={"120px"} height={"100vh"} display={"flex"} flexDirection={"column"}>
-      {/* -------------------------------------------------------------------------------------------------------------------- */}
-      {/* top 4 stats cards container */}
-      <Box display={"flex"} justifyContent={"flex-start"} alignItems={"flex-start"} marginBottom={"50px"}>
-        <StatsCard statsName={"Tickets"} statsIcon={"/logos/tickets.png"} value={ticketStatsCardStates.value} percentChange={ticketStatsCardStates.percentChange} />
-        <StatsCard statsName={"Queries"} statsIcon={"/logos/queries.png"} value={queryStatsCardStates.value} percentChange={queryStatsCardStates.percentChange} />
-        <StatsCard statsName={"Users weekly"} statsIcon={"/logos/users.png"} value={weeklyUserStatsCardStates.value} percentChange={weeklyUserStatsCardStates.percentChange} />
-        <StatsCard statsName={"User daily"} statsIcon={"/logos/users.png"} value={dailyUserStatsCardStates.value} percentChange={dailyUserStatsCardStates.percentChange} />
-      </Box>
-      {/* -------------------------------------------------------------------------------------------------------------------- */}
-      {/* bottom 3 channel bot cards container */}
-      <Box display={"flex"} justifyContent={"flex-start"} alignItems={"flex-start"} marginBottom={"50px"}>
-        <SourceBotCard
-          sourceIcon={"/logos/discord.png"}
-          sourceName={"discord"}
-          lastQueryDatetime={discordBotCardStates.lastQueryDatetime}
-          isOnline={discordBotCardStates.isOnline}
-          selectedSource={selectedSource}
-          openTicketsCount={discordBotCardStates.openTicketsCount}
-          selectSourceHandler={selectSourceHandler}
-        />
-        <SourceBotCard
-          sourceIcon={"/logos/telegram.png"}
-          sourceName={"telegram"}
-          lastQueryDatetime={telegramBotCardStates.lastQueryDatetime}
-          isOnline={telegramBotCardStates.isOnline}
-          selectedSource={selectedSource}
-          openTicketsCount={telegramBotCardStates.openTicketsCount}
-          selectSourceHandler={selectSourceHandler}
-        />
-        <SourceBotCard
-          sourceIcon={"/logos/main_site.png"}
-          sourceName={"main site"}
-          lastQueryDatetime={mainSiteBotCardStates.lastQueryDatetime}
-          isOnline={mainSiteBotCardStates.isOnline}
-          selectedSource={selectedSource}
-          openTicketsCount={mainSiteBotCardStates.openTicketsCount}
-          selectSourceHandler={selectSourceHandler}
-        />
-      </Box>
-      {/* -------------------------------------------------------------------------------------------------------------------- */}
-      {/* Ticket management container */}
-      <Box display={"flex"} justifyContent={"flex-start"} alignItems={"flex-start"} flexGrow={1}>
-        {/* Ticket list containers */}
-        <Box width={"456px"} marginRight={"35px"}>
-          <Box
-            width={"100%"}
-            bgcolor={cardBgColor}
-            display={"flex"}
-            justifyContent={"flex-start"}
-            alignItems={"center"}
-            padding={"15px"}
-            sx={{
-              borderTopRightRadius: "15px",
-              borderTopLeftRadius: "15px",
-            }}
-          >
-            <Image src={"/logos/docs.png"} width={20} height={24} alt='docs icon' quality={100} />
-            <Typography marginLeft={"20px"}>Open Tickets</Typography>
-          </Box>
-          <Box
-            sx={{
-              // the ticket box container height is dynamically calculated hard set based on PX value, this is to make the box scrollable
-              height: "calc(100vh - 490px)",
-              overflowY: "auto",
-              "&::-webkit-scrollbar": {
-                width: "5px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#f1f1f1",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#888",
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                background: "#555",
-              },
-            }}
-          >
-            {/* all ticket boxes */}
-            {sourceOpenTickets.map((ticket: TicketSchemaWithoutMessages, index: number) => {
-              return <TicketItem key={index} ticket={ticket} getTicketApiHandler={getTicketApiHandler} />;
-            })}
-          </Box>
+    <Box className="flex-1 space-y-4 p-8 pt-6">
+      <Box className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <Box className="flex items-center space-x-2">
+          <ToggleGroup type="single">
+            <ToggleGroupItem value="Weekly">Weekly</ToggleGroupItem>
+            <ToggleGroupItem value="Monthly">Monthly</ToggleGroupItem>
+          </ToggleGroup>
         </Box>
-        {/* ---------------------------------------------------------------------------------------------------------------- */}
-        {/* Ticket response containers */}
-        <Box width={"456px"}>
-          <Box
-            display={"flex"}
-            sx={{
-              border: 2,
-              borderColor: borderColor,
-              borderTopRightRadius: "15px",
-              borderTopLeftRadius: "15px",
-            }}
-            padding={"13px"}
-          >
-            <Box>
-              <AccountCircleOutlinedIcon sx={{ fontSize: 20 }} />
+      </Box>
+      <Box className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatsCard statsName={"Unique users"} statsIcon={"/logos/users.png"} value={weeklyUserStatsCardStates.value} percentChange={weeklyUserStatsCardStates.percentChange} />
+        <StatsCard statsName={"Queries"} statsIcon={"/logos/queries.png"} value={queryStatsCardStates.value} percentChange={queryStatsCardStates.percentChange} />
+        <StatsCard statsName={"Open tickets"} statsIcon={"/logos/tickets.png"} value={ticketStatsCardStates.value} percentChange={ticketStatsCardStates.percentChange} />
+        <StatsCard statsName={"Ticket’s Response Time"} statsIcon={"/logos/users.png"} value={dailyUserStatsCardStates.value} percentChange={dailyUserStatsCardStates.percentChange} />
+      </Box>
+      <Box className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 grid-rows-3">
+        <Card className="col-span-3 row-span-full">
+          <CardHeader>
+            <CardTitle className='text-lg font-medium'>Insight</CardTitle>
+            <CardDescription className='text-sm'>Proposals for Dev Portal improvements based on user queries.</CardDescription>
+          </CardHeader>
+          <Separator className="w-[90%] m-auto"/>
+          <CardContent className="py-5">
+            <Box className='flex justify-between items-start'>
+              {/*<Image src={zapImage} width={32} height={32} alt='zap icon' />*/}
+              <Box className='pl-4 pr-[2rem]'>
+                <p className='text-foreground text-sm'>
+                  Add more information about <b>signatureSubscribe</b>. Users often ask for a description of how this feature works.
+                </p>
+                <br/>
+                <p>
+                  This may be due to a lack of clarity in the description of how the function works or its location in an inconvenient place.
+                </p>
+                <br/>
+                <p>Please add this information to the knowledge base and update it.</p>
+              </Box>
             </Box>
-            <Typography marginLeft={"10px"}>Username</Typography>
-          </Box>
-          <Box
-            display={"flex"}
-            flexDirection={"column"}
-            sx={{
-              height: "calc(100vh - 490px)",
-              border: 2,
-              borderTop: 0,
-              borderColor: borderColor,
-              borderBottomRightRadius: "15px",
-              borderBottomLeftRadius: "15px",
-            }}
-          >
-            <Box
-              height={"calc(100vh - 540px)"}
-              padding={"15px"}
-              sx={{
-                overflowY: "auto",
-                "&::-webkit-scrollbar": {
-                  width: "5px",
-                },
-                "&::-webkit-scrollbar-track": {
-                  background: "#f1f1f1",
-                },
-                "&::-webkit-scrollbar-thumb": {
-                  background: "#888",
-                },
-                "&::-webkit-scrollbar-thumb:hover": {
-                  background: "#555",
-                },
-              }}
-            >
-              {/* all message boxes */}
-              {targetTicketMessages.map((message: TicketMessagesSchema, index: number) => {
-                return <MessageCard key={index} message={message} />;
-              })}
-              <div ref={messagesContainerRef} />
-            </Box>
-            <Box flexGrow={1} padding={"10px"} width={"100%"}>
-              <CustomTextField addTicketResponseMessageApiHandler={addTicketResponseMessageApiHandler} ticketId={targetTicketMessages[0]?.ticketId} />
-            </Box>
-          </Box>
+          </CardContent>
+        </Card>
+        <Box className="col-span-3 row-span-1 grid gap-4 grid-cols-2">
+          <StatsCard statsName={"AI Success Rate"} statsIcon={"/logos/users.png"} value='98.3%' />
+          <StatsCard statsName={"Time Saved"} statsIcon={"/logos/users.png"} value='260H' />
+        </Box>
+        <Box className="col-span-3 row-span-2 flex flex-col items-center justify-center">
+          <Button variant='outline' className='w-[300px]'>Update Knowledge Base</Button>
         </Box>
       </Box>
     </Box>
