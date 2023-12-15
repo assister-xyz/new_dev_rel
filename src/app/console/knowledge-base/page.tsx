@@ -9,7 +9,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { EmbeddedFileStatesInterface, SourceBotCardStatesInterface } from "@/types/states";
-import { deleteEmbeddedFileApi, embeddAndStoreFileApi, getEmbeddedFileRefsApi } from "@/apis/spacePage";
+import { deleteEmbeddedFileApi, embeddAndStoreFileApi, getEmbeddedFileRefsApi } from "@/apis/knowledgePage";
 import FileCard from "@/components/FileCard";
 import AddFileCard from "@/components/AddFileCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

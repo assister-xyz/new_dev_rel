@@ -8,7 +8,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import MessageCard from "@/components/MessageCard";
 import CustomTextField from "@/components/CustomTextField";
 import { TicketMessagesSchema, TicketResponseMessagesSchema, TicketSchema, TicketSchemaWithoutMessages } from "@/types/apiResponseSchema";
-import { addTicketResponseMessageApi, getOpenTicketsBySourceApi, getTicketApi } from "@/apis/ticketPage";
+import { addTicketResponseMessageApi, getOpenTicketsByPageApi, getTicketApi, updateTicketStatusApi } from "@/apis/ticketPage";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { borderColor } from "@/themes/colors";
@@ -17,6 +17,7 @@ export default function TicketsPage(): ReactElement {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedSource, setSelectedSource] = useState<string>("discord");
+  const [ticketUsername, setTicketUsername] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
@@ -25,6 +26,9 @@ export default function TicketsPage(): ReactElement {
   const [tableData, setTableData] = useState<{ id: string; user: string; task: string; status: string }[]>([]);
 
   // ----------------------------------------------------------------------------------------------------------------------------
+  function setTicketUsernameHandler(username: string): void {
+    setTicketUsername(username);
+  }
 
   function goToNextPageHandler(): void {
     if (currentPage < totalPage) {
@@ -86,6 +90,45 @@ export default function TicketsPage(): ReactElement {
     }
   }
 
+  async function updateTicketStatusApiHandler(ticketId: string, status: string, source: string, page: number): Promise<void> {
+    try {
+      const putResponse: Response = await updateTicketStatusApi(ticketId, status);
+      if (putResponse.ok === false) {
+        const responsePayload: { result: string } = await putResponse.json();
+        throw new Error(responsePayload.result);
+      }
+
+      setTargetTicketMessages([]);
+
+      const clientName: string | null = localStorage.getItem("client");
+      if (clientName) {
+        const getResponse: Response = await getOpenTicketsByPageApi(source, clientName, page);
+        if (getResponse.ok === false) {
+          const responsePayload: { result: string } = await getResponse.json();
+          throw new Error(responsePayload.result);
+        }
+
+        const responsePayload: { result: { page_tickets: TicketSchemaWithoutMessages[]; total_pages: number } } = await getResponse.json();
+
+        setTotalPage(responsePayload.result.total_pages);
+        setTableData(
+          responsePayload.result.page_tickets.map((ticket: TicketSchemaWithoutMessages) => {
+            return {
+              id: ticket.id,
+              user: ticket.username,
+              task: ticket.request,
+              status: ticket.status,
+            };
+          })
+        );
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      }
+    }
+  }
+
   async function getTicketApiHandler(ticketId: string): Promise<void> {
     try {
       const getResponse: Response = await getTicketApi(ticketId);
@@ -96,6 +139,7 @@ export default function TicketsPage(): ReactElement {
       }
       // when no error, we process response payload then parse it to update the target ticket messages state
       const responsePayload: { result: TicketSchema } = await getResponse.json();
+      setTicketUsernameHandler(responsePayload.result.username);
       setTargetTicketMessages(responsePayload.result.messages);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -109,7 +153,7 @@ export default function TicketsPage(): ReactElement {
       console.log("getOpenTicketsByPageApiHandler runs");
 
       try {
-        const getResponse: Response = await getOpenTicketsBySourceApi(source, clientName, page);
+        const getResponse: Response = await getOpenTicketsByPageApi(source, clientName, page);
         if (getResponse.ok === false) {
           const responsePayload: { result: string } = await getResponse.json();
           throw new Error(responsePayload.result);
@@ -241,6 +285,8 @@ export default function TicketsPage(): ReactElement {
         <Box width={"100%"}>
           <Box
             display={"flex"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
             sx={{
               border: 1,
               borderColor: "#1C1C1C1A",
@@ -249,10 +295,29 @@ export default function TicketsPage(): ReactElement {
             }}
             padding={"13px"}
           >
-            <Box>
+            <Box display={"flex"}>
               <AccountCircleOutlinedIcon sx={{ fontSize: 20 }} />
+              <Typography marginLeft={"10px"}>{ticketUsername}</Typography>
             </Box>
-            <Typography marginLeft={"10px"}>Username</Typography>
+            {targetTicketMessages.length === 0 ? (
+              <></>
+            ) : (
+              <Box
+                paddingX={"15px"}
+                paddingY={"5px"}
+                bgcolor={"black"}
+                borderRadius={"10px"}
+                sx={{
+                  "&:hover": {
+                    cursor: "pointer",
+                    opacity: "0.8",
+                  },
+                }}
+                onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "closed", selectedSource, currentPage)}
+              >
+                <Typography color={"white"}>Close Ticket</Typography>
+              </Box>
+            )}
           </Box>
           <Box
             display={"flex"}
