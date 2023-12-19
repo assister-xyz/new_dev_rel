@@ -7,7 +7,7 @@ import { Box, TextField, Typography } from "@mui/material";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ReactElement, use, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 export default function AuthPage(): ReactElement {
   const router: AppRouterInstance = useRouter();
@@ -30,7 +30,11 @@ export default function AuthPage(): ReactElement {
       }
       // if login is successful we will store the client name in localStorage (value come from server) + navigate to dashboard after 500ms
       const responsePayload: { result: string } = await postResponse.json();
-      localStorage.setItem("client", responsePayload.result);
+      if (responsePayload.result === "particle network") {
+        localStorage.setItem("client", "particle");
+      } else {
+        localStorage.setItem("client", responsePayload.result);
+      }
 
       // we then navigate to dashboard after 500ms
       setTimeout(() => {
