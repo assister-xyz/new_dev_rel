@@ -197,8 +197,10 @@ export default function TicketsPage(): ReactElement {
       <Box className='flex items-center justify-between space-y-2'>
         <h2 className='text-3xl font-bold tracking-tight'>Tickets</h2>
       </Box>
-      <Box className='grid gap-4 grid-cols-3'>
+      <Box className='grid gap-4 grid-cols-4'>
         <Box className='col-span-2'>
+          {/* ---------------------------------------------------------------------------------------------------------------------------------------- */}
+          {/* ticket source selector */}
           <Box display={"flex"} marginBottom={"15px"}>
             <Box
               onClick={() => setSelectedSourceHandler("discord")}
@@ -241,8 +243,13 @@ export default function TicketsPage(): ReactElement {
             </Box>
           </Box>
 
+          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+          {/* tickets */}
+
           <DataTable data={tableData} columns={columns} getTicketApiHandler={getTicketApiHandler} />
 
+          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
+          {/* ticket page navigation handle */}
           <Box display={"flex"} justifyContent={"flex-end"} marginTop={"20px"} alignItems={"center"}>
             <Box
               onClick={goToPreviousPageHandler}
@@ -282,7 +289,7 @@ export default function TicketsPage(): ReactElement {
           </Box>
         </Box>
         {/* Ticket response containers */}
-        <Box width={"100%"}>
+        <Box width={"100%"} className='col-span-2'>
           <Box
             display={"flex"}
             justifyContent={"space-between"}
