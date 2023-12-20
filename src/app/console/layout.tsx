@@ -44,9 +44,9 @@ export default function ConsoleLayout({ children }: { children: ReactElement }):
       {/* assisterr logo section */}
       <Box className='ml-5 pt-5' width={"130px"}>
         <Image src={logoImage} alt='assisterr logo' width={130} height={23} />
-        <Typography variant={"h4"} marginY={"10px"} textAlign={"center"}>
+        {/* <Typography variant={"h4"} marginY={"10px"} textAlign={"center"}>
           {capitalizeFirstLetter(targetClient)}
-        </Typography>
+        </Typography> */}
       </Box>
       {/* ------------------------------------------------------------------------------------------------------ */}
       <Box className='overflow-hidden rounded-[0.5rem] border shadow m-5'>
