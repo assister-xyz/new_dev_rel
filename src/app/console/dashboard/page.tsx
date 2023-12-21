@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import SpinnerLoading from "@/components/SpinnerLoading";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 
 export default function DashboardPage(): ReactElement {
   const router: AppRouterInstance = useRouter();
@@ -33,7 +34,7 @@ export default function DashboardPage(): ReactElement {
   // ------------------------------------------------------------------------------------------------------------------------------------------------
 
   function periodToggleHandler(period: string): void {
-    setPeriod(period);
+    period && setPeriod(period);
   }
 
   // ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,41 +113,14 @@ export default function DashboardPage(): ReactElement {
 
         {/* ------------------------------------------------------------------------------------------------------------------------------ */}
         {/* period selection */}
-
-        <Box className='flex items-center space-x-2' bgcolor={"#F1F5F9"} padding={"10px"} borderRadius={"10px"}>
-          <Typography
-            variant='h6'
-            bgcolor={period === "weekly" ? "white" : "#F1F5F9"}
-            padding={"7px"}
-            borderRadius={"10px"}
-            onClick={() => {
-              periodToggleHandler("weekly");
-            }}
-            sx={{
-              "&:hover": {
-                cursor: "pointer",
-              },
-            }}
-          >
+        <ToggleGroup type="single" value={period} onValueChange={periodToggleHandler}>
+          <ToggleGroupItem value="weekly" aria-label="Toggle weekly">
             Weekly
-          </Typography>
-          <Typography
-            variant='h6'
-            bgcolor={period === "monthly" ? "white" : "#F1F5F9"}
-            padding={"7px"}
-            borderRadius={"10px"}
-            onClick={() => {
-              periodToggleHandler("monthly");
-            }}
-            sx={{
-              "&:hover": {
-                cursor: "pointer",
-              },
-            }}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="monthly" aria-label="Toggle monthly">
             Monthly
-          </Typography>
-        </Box>
+          </ToggleGroupItem>
+        </ToggleGroup>
       </Box>
 
       {/* ------------------------------------------------------------------------------------------------------------------------------ */}
