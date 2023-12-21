@@ -11,7 +11,7 @@ export default function StatsCard({ statsName, statsIconPath, value, percentChan
     <Card>
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
         <Typography variant='h6'>{statsName}</Typography>
-        <Image src={statsIconPath} width={22} height={22} alt='folder icon' quality={100} />
+        <Image src={statsIconPath} width={24} height={24} alt='folder icon' quality={100} />
       </CardHeader>
       <CardContent>
         <Box className='flex items-center justify-between' paddingY={"10px"}>
