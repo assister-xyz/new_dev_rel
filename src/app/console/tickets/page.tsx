@@ -246,60 +246,25 @@ export default function TicketsPage(): ReactElement {
           {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
           {/* tickets */}
 
-          <DataTable data={tableData} columns={columns} getTicketApiHandler={getTicketApiHandler} />
+          <DataTable
+            data={tableData}
+            columns={columns}
+            getTicketApiHandler={getTicketApiHandler}
+            goToPreviousPageHandler={goToPreviousPageHandler}
+            goToNextPageHandler={goToNextPageHandler}
+          />
 
           {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
           {/* ticket page navigation handle */}
-          <Box display={"flex"} justifyContent={"flex-end"} marginTop={"20px"} alignItems={"center"}>
-            <Box
-              onClick={goToPreviousPageHandler}
-              padding={"4px 10px 7px 10px"}
-              border={2}
-              borderRadius={"10px"}
-              borderColor={borderColor}
-              marginRight={"15px"}
-              sx={{
-                "&:hover": {
-                  cursor: "pointer",
-                  backgroundColor: "#F1F5F9",
-                },
-              }}
-            >
-              <ArrowBackIosNewIcon sx={{ fontSize: "16px" }} />
-            </Box>
-            <Typography variant='h6'>
-              Page {totalPage !== 0 ? currentPage : 0} of {totalPage}
-            </Typography>
-            <Box
-              onClick={goToNextPageHandler}
-              padding={"4px 10px 7px 10px"}
-              border={2}
-              borderRadius={"10px"}
-              borderColor={borderColor}
-              marginLeft={"15px"}
-              sx={{
-                "&:hover": {
-                  cursor: "pointer",
-                  backgroundColor: "#F1F5F9",
-                },
-              }}
-            >
-              <ArrowForwardIosIcon sx={{ fontSize: "16px" }} />
-            </Box>
-          </Box>
+
         </Box>
         {/* Ticket response containers */}
-        <Box width={"100%"} className='col-span-2'>
+        <Box width={"100%"} className='col-span-2 mt-[59px]'>
           <Box
+            className={`rounded-t-md border border-input`}
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            sx={{
-              border: 1,
-              borderColor: "#1C1C1C1A",
-              borderTopLeftRadius: "8px",
-              borderTopRightRadius: "8px",
-            }}
             padding={"13px"}
           >
             <Box display={"flex"}>
@@ -327,15 +292,11 @@ export default function TicketsPage(): ReactElement {
             )}
           </Box>
           <Box
+            className={`rounded-b-md border border-input border-t-0`}
             display={"flex"}
             flexDirection={"column"}
             sx={{
               height: "calc(100vh - 490px)",
-              border: 1,
-              borderTop: 0,
-              borderBottomRightRadius: "8px",
-              borderBottomLeftRadius: "8px",
-              borderColor: "#1C1C1C1A",
             }}
           >
             <Box
