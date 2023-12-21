@@ -44,9 +44,6 @@ export default function ConsoleLayout({ children }: { children: ReactElement }):
       {/* assisterr logo section */}
       <Box className='ml-5 pt-5' width={"130px"}>
         <Image src={logoImage} alt='assisterr logo' width={130} height={23} />
-        {/* <Typography variant={"h4"} marginY={"10px"} textAlign={"center"}>
-          {capitalizeFirstLetter(targetClient)}
-        </Typography> */}
       </Box>
       {/* ------------------------------------------------------------------------------------------------------ */}
       <Box className='overflow-hidden rounded-[0.5rem] border shadow m-5'>
@@ -57,13 +54,16 @@ export default function ConsoleLayout({ children }: { children: ReactElement }):
               <MainNavigation className='mx-6' />
               {/* MainNavigation component */}
               <Box className='ml-auto flex items-center space-x-4'>
+                <Typography variant={"h6"} fontWeight={500} marginRight={"5px"}>
+                  {capitalizeFirstLetter(targetClient)}
+                </Typography>
                 <UserNavigation targetClient={targetClient} />
               </Box>
               {/* ------------------------------------------------------------------------------------------------------ */}
             </Box>
           </Box>
           {/* ------------------------------------------------------------------------------------------------------ */}
-          <Box className='min-h-[500px]'>{children}</Box>
+          <Box className='min-h-[80vh]'>{children}</Box>
         </Box>
       </Box>
     </Box>
