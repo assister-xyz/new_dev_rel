@@ -9,14 +9,15 @@ import MessageCard from "@/components/MessageCard";
 import CustomTextField from "@/components/CustomTextField";
 import { TicketMessagesSchema, TicketResponseMessagesSchema, TicketSchema, TicketSchemaWithoutMessages } from "@/types/apiResponseSchema";
 import { addTicketResponseMessageApi, getOpenTicketsByPageApi, getTicketApi, updateTicketStatusApi } from "@/apis/ticketPage";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { borderColor } from "@/themes/colors";
+import {Button} from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DotsHorizontalIcon, CheckIcon } from "@radix-ui/react-icons";
 
 export default function TicketsPage(): ReactElement {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [selectedSource, setSelectedSource] = useState<string>("discord");
+  const [selectedTicket, setSelectedTicket] = useState<{ id: string; user: string; task: string; status: string } | null>(null);
   const [ticketUsername, setTicketUsername] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -162,7 +163,6 @@ export default function TicketsPage(): ReactElement {
         const responsePayload: { result: { page_tickets: TicketSchemaWithoutMessages[]; total_pages: number } } = await getResponse.json();
 
         setTotalPage(responsePayload.result.total_pages);
-
         setTableData(
           responsePayload.result.page_tickets.map((ticket: TicketSchemaWithoutMessages) => {
             return {
@@ -252,6 +252,7 @@ export default function TicketsPage(): ReactElement {
             getTicketApiHandler={getTicketApiHandler}
             goToPreviousPageHandler={goToPreviousPageHandler}
             goToNextPageHandler={goToNextPageHandler}
+            setSelectedTicket={setSelectedTicket}
           />
 
           {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
@@ -271,25 +272,62 @@ export default function TicketsPage(): ReactElement {
               <AccountCircleOutlinedIcon sx={{ fontSize: 20 }} />
               <Typography marginLeft={"10px"}>{ticketUsername}</Typography>
             </Box>
-            {targetTicketMessages.length === 0 ? (
-              <></>
-            ) : (
-              <Box
-                paddingX={"15px"}
-                paddingY={"5px"}
-                bgcolor={"black"}
-                borderRadius={"10px"}
-                sx={{
-                  "&:hover": {
-                    cursor: "pointer",
-                    opacity: "0.8",
-                  },
-                }}
-                onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "closed", selectedSource, currentPage)}
-              >
-                <Typography color={"white"}>Close Ticket</Typography>
+
+            {targetTicketMessages.length !== 0 &&
+              <Box className='flex items-center'>
+                <Button
+                  size='xs'
+                  className='mr-2'
+                >
+                  Add to Knowledge Base
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                    >
+                      <DotsHorizontalIcon className="h-4 w-4" />
+                      <span className="sr-only">Open menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[160px]">
+                    <DropdownMenuItem
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "open", selectedSource, currentPage)}
+                    >
+                      Open
+                      {
+                        selectedTicket?.status === 'open' && <CheckIcon/>
+                      }
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "in progress", selectedSource, currentPage)}
+                    >
+                      In Progress
+                      {
+                        selectedTicket?.status === 'in progress' && <CheckIcon/>
+                      }
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "closed", selectedSource, currentPage)}
+                    >
+                      Closed
+                      {
+                        selectedTicket?.status === 'closed' && <CheckIcon/>
+                      }
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "other", selectedSource, currentPage)}
+                    >
+                      Other
+                      {
+                        selectedTicket?.status === 'other' && <CheckIcon/>
+                      }
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </Box>
-            )}
+            }
           </Box>
           <Box
             className={`rounded-b-md border border-input border-t-0`}
