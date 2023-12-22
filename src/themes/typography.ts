@@ -39,8 +39,8 @@ export const customTypography = {
     fontWeight: "bold",
   },
   h6: {
-    fontFamily: ["Inter", "Roboto Mono"].join(","),
+    fontFamily: ["Inter"].join(","),
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
 };
