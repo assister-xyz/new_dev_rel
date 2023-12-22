@@ -41,10 +41,12 @@ export default function AuthPage(): ReactElement {
         <Box className="relative hidden h-full flex-col bg-muted bg-white p-10 dark:border-r lg:flex">
           <Box className="absolute inset-0">
             <Image
-              src="/imgs/bg-full.svg"
+              src="/imgs/bg-full.png"
               fill
               alt="Authentication"
               style={{objectFit: 'cover'}}
+              quality={100}
+              priority
             />
           </Box>
           <Box className="relative z-20 flex items-center text-lg font-medium">
