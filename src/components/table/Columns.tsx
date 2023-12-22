@@ -94,12 +94,14 @@ export const columns: ColumnDef<Task>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="flex space-x-2">
-					<span className="max-w-[400px] truncate font-medium">
+					<span className="max-w-[400px] font-medium">
             {row.getValue("task")}
           </span>
 				</div>
 			)
 		},
+		enableSorting: false,
+		enableHiding: false,
 	},
 	{
 		accessorKey: "status",
@@ -127,5 +129,7 @@ export const columns: ColumnDef<Task>[] = [
 		filterFn: (row, id, value) => {
 			return value.includes(row.getValue(id))
 		},
+		enableSorting: false,
+		enableHiding: false,
 	},
 ]

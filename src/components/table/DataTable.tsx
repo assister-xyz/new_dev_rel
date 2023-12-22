@@ -24,9 +24,11 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: any[];
   getTicketApiHandler: any;
+  goToNextPageHandler: Function;
+  goToPreviousPageHandler: Function;
 }
 
-export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler }: DataTableProps<TData, TValue>): React.JSX.Element {
+export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, goToPreviousPageHandler, goToNextPageHandler}: DataTableProps<TData, TValue>): React.JSX.Element {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -98,6 +100,11 @@ export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler }:
           </TableBody>
         </Table>
       </div>
+      <DataTablePagination
+        table={table}
+        goToPreviousPageHandler={goToPreviousPageHandler}
+        goToNextPageHandler={goToNextPageHandler}
+      />
     </div>
   );
 }

@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import SpinnerLoading from "@/components/SpinnerLoading";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 
 export default function DashboardPage(): ReactElement {
   const router: AppRouterInstance = useRouter();
@@ -33,7 +34,7 @@ export default function DashboardPage(): ReactElement {
   // ------------------------------------------------------------------------------------------------------------------------------------------------
 
   function periodToggleHandler(period: string): void {
-    setPeriod(period);
+    period && setPeriod(period);
   }
 
   // ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,53 +113,26 @@ export default function DashboardPage(): ReactElement {
 
         {/* ------------------------------------------------------------------------------------------------------------------------------ */}
         {/* period selection */}
-
-        <Box className='flex items-center space-x-2' bgcolor={"#F1F5F9"} padding={"10px"} borderRadius={"10px"}>
-          <Typography
-            variant='h6'
-            bgcolor={period === "weekly" ? "white" : "#F1F5F9"}
-            padding={"7px"}
-            borderRadius={"10px"}
-            onClick={() => {
-              periodToggleHandler("weekly");
-            }}
-            sx={{
-              "&:hover": {
-                cursor: "pointer",
-              },
-            }}
-          >
+        <ToggleGroup type="single" value={period} onValueChange={periodToggleHandler}>
+          <ToggleGroupItem value="weekly" aria-label="Toggle weekly">
             Weekly
-          </Typography>
-          <Typography
-            variant='h6'
-            bgcolor={period === "monthly" ? "white" : "#F1F5F9"}
-            padding={"7px"}
-            borderRadius={"10px"}
-            onClick={() => {
-              periodToggleHandler("monthly");
-            }}
-            sx={{
-              "&:hover": {
-                cursor: "pointer",
-              },
-            }}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="monthly" aria-label="Toggle monthly">
             Monthly
-          </Typography>
-        </Box>
+          </ToggleGroupItem>
+        </ToggleGroup>
       </Box>
 
       {/* ------------------------------------------------------------------------------------------------------------------------------ */}
       {/* top 4 stats card */}
 
       <Box className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <StatsCard statsName={"Unique users"} statsIconPath={"/logos/users.png"} value={userStatsCardStates.value} percentChange={userStatsCardStates.percentChange} />
-        <StatsCard statsName={"Queries"} statsIconPath={"/logos/queries.png"} value={queryStatsCardStates.value} percentChange={queryStatsCardStates.percentChange} />
-        <StatsCard statsName={"Open tickets"} statsIconPath={"/logos/ticket.png"} value={ticketStatsCardStates.value} percentChange={ticketStatsCardStates.percentChange} />
+        <StatsCard statsName={"Unique users"} statsIconPath={"/logos/users.svg"} value={userStatsCardStates.value} percentChange={userStatsCardStates.percentChange} />
+        <StatsCard statsName={"Queries"} statsIconPath={"/logos/queries.svg"} value={queryStatsCardStates.value} percentChange={queryStatsCardStates.percentChange} />
+        <StatsCard statsName={"Open tickets"} statsIconPath={"/logos/ticket.svg"} value={ticketStatsCardStates.value} percentChange={ticketStatsCardStates.percentChange} />
         <StatsCard
           statsName={"Tickets Response Time"}
-          statsIconPath={"/logos/response_time.png"}
+          statsIconPath={"/logos/response_time.svg"}
           value={ticketResponseTimeStatsCardStates.value}
           percentChange={ticketResponseTimeStatsCardStates.percentChange}
         />
@@ -168,44 +142,50 @@ export default function DashboardPage(): ReactElement {
       {/* Bottom */}
 
       <Box className='grid gap-4 md:grid-cols-2 lg:grid-cols-6 grid-rows-3'>
-        <Card className='col-span-3 row-span-full'>
+        <Card className='col-span-3 row-span-full flex flex-col'>
           <CardHeader>
             <Typography variant='h4'>Insight</Typography>
             <Typography className='text-sm'>Proposals for Dev Portal improvements based on user queries.</Typography>
           </CardHeader>
           <Separator className='w-[90%] ml-5' />
-          <CardContent className='py-5'>
-            <Box className='flex justify-between items-start' height={"300px"} overflow={"auto"}>
-              <Image src={"/logos/ai_zap.png"} width={32} height={32} alt='zap icon' />
-
-              <Box className='pl-5 pr-[2rem]' width={"100%"}>
-                {faqInsightLoading ? (
-                  <Box display={"flex"} justifyContent={"center"} alignItems={"center"} width={"100%"} height={"250px"}>
-                    <SpinnerLoading width='90px' height='90px' border={8} />
-                  </Box>
-                ) : (
-                  <Typography
-                    sx={{
-                      whiteSpace: "pre-line",
-                    }}
-                  >
-                    {faqInsight}
-                  </Typography>
-                )}
-              </Box>
+          <CardContent className='py-5 flex-1'>
+            <Box className='flex justify-center items-center h-full'>
+              <Image src={"/logos/zap.svg"} width={32} height={32} className='mr-2' alt='zap icon' />
+              <Typography variant='body1'>
+                Launching soon. We are collecting data to generate insights for you.
+              </Typography>
             </Box>
+            {/*<Box className='flex justify-between items-start' height={"300px"} overflow={"auto"}>*/}
+            {/*  <Image src={"/logos/zap.svg"} width={32} height={32} alt='zap icon' />*/}
+
+            {/*  <Box className='pl-5 pr-[2rem]' width={"100%"}>*/}
+            {/*    {faqInsightLoading ? (*/}
+            {/*      <Box display={"flex"} justifyContent={"center"} alignItems={"center"} width={"100%"} height={"250px"}>*/}
+            {/*        <SpinnerLoading width='90px' height='90px' border={8} />*/}
+            {/*      </Box>*/}
+            {/*    ) : (*/}
+            {/*      <Typography*/}
+            {/*        sx={{*/}
+            {/*          whiteSpace: "pre-line",*/}
+            {/*        }}*/}
+            {/*      >*/}
+            {/*        {faqInsight}*/}
+            {/*      </Typography>*/}
+            {/*    )}*/}
+            {/*  </Box>*/}
+            {/*</Box>*/}
           </CardContent>
         </Card>
         <Box className='col-span-3 row-span-1 grid gap-4 grid-cols-2'>
           <StatsCard
             statsName={"AI Success Rate"}
-            statsIconPath={"/logos/ai.png"}
+            statsIconPath={"/logos/ai.svg"}
             value={aiSuccessRateStatsCardStates.value}
             percentChange={aiSuccessRateStatsCardStates.percentChange}
           />
           <StatsCard
             statsName={"Time Saved"}
-            statsIconPath={"/logos/time_saved.png"}
+            statsIconPath={"/logos/time_saved.svg"}
             value={timeSavedStatsCardStates.value}
             percentChange={timeSavedStatsCardStates.percentChange}
           />
