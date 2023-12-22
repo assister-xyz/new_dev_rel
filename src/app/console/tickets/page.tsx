@@ -1,6 +1,7 @@
 "use client";
 
 import React, { ReactElement, useEffect, useRef, useState } from "react";
+import CodeEditor from '@uiw/react-textarea-code-editor';
 import { Box, Typography } from "@mui/material";
 import { DataTable } from "@/components/table/DataTable";
 import { columns } from "@/components/table/Columns";
@@ -12,9 +13,36 @@ import { addTicketResponseMessageApi, getOpenTicketsByPageApi, getTicketApi, upd
 import {Button} from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon, CheckIcon } from "@radix-ui/react-icons";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
 
 export default function TicketsPage(): ReactElement {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const [code, setCode] = useState(`
+    import os
+    import openai
+    
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    
+    response = openai.Completion.create(
+      model="davinci",
+      prompt="",
+      temperature=0.9,
+      max_tokens=5,
+      top_p=1,  
+      frequency_penalty=0,
+      presence_penalty=0,
+    )               
+  `);
 
   const [selectedSource, setSelectedSource] = useState<string>("discord");
   const [selectedTicket, setSelectedTicket] = useState<{ id: string; user: string; task: string; status: string } | null>(null);
@@ -275,12 +303,52 @@ export default function TicketsPage(): ReactElement {
 
             {targetTicketMessages.length !== 0 &&
               <Box className='flex items-center'>
-                <Button
-                  size='xs'
-                  className='mr-2'
-                >
-                  Add to Knowledge Base
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size='xs'
+                      className='mr-2'
+                    >
+                      Add to Knowledge Base
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[625px]">
+                    <DialogHeader>
+                      <DialogTitle>Add to Knowledge Base</DialogTitle>
+                      <DialogDescription>
+                        Please check content before adding to Knowledge Base. New data source will be in added as separated txt file.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <CodeEditor
+                        value={code}
+                        language="js"
+                        placeholder="Please enter JS code."
+                        onChange={(evn) => setCode(evn.target.value)}
+                        padding={15}
+                        style={{
+                          borderRadius: '6px',
+                          backgroundColor: "#000000",
+                          fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+                          overflowY: 'scroll',
+                          height: 280,
+                        }}
+                      />
+                      <div>
+                        <Label htmlFor="username" className="text-right">
+                          Doc Name
+                        </Label>
+                        <Input
+                          id="taskName"
+                          placeholder={'ticket #12412'}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter className='sm:justify-start'>
+                      <Button type="submit">Save</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
