@@ -26,9 +26,10 @@ interface DataTableProps<TData, TValue> {
   getTicketApiHandler: any;
   goToNextPageHandler: Function;
   goToPreviousPageHandler: Function;
+  setSelectedTicket: Function;
 }
 
-export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, goToPreviousPageHandler, goToNextPageHandler}: DataTableProps<TData, TValue>): React.JSX.Element {
+export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, goToPreviousPageHandler, goToNextPageHandler, setSelectedTicket}: DataTableProps<TData, TValue>): React.JSX.Element {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -82,6 +83,7 @@ export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, g
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => {
                     getTicketApiHandler(row.original.id);
+                    setSelectedTicket(row.original)
                     console.log(row);
                   }}
                 >
