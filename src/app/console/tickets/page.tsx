@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
+import Image from "next/image";
 
 export default function TicketsPage(): ReactElement {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -45,14 +46,14 @@ export default function TicketsPage(): ReactElement {
   `);
 
   const [selectedSource, setSelectedSource] = useState<string>("discord");
-  const [selectedTicket, setSelectedTicket] = useState<{ id: string; user: string; task: string; status: string } | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<TicketSchemaWithoutMessages | null>(null);
   const [ticketUsername, setTicketUsername] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
 
   const [targetTicketMessages, setTargetTicketMessages] = useState<TicketMessagesSchema[]>([]);
-  const [tableData, setTableData] = useState<{ id: string; user: string; task: string; status: string }[]>([]);
+  const [tableData, setTableData] = useState<TicketSchemaWithoutMessages[]>([]);
 
   // ----------------------------------------------------------------------------------------------------------------------------
   function setTicketUsernameHandler(username: string): void {
@@ -141,14 +142,7 @@ export default function TicketsPage(): ReactElement {
 
         setTotalPage(responsePayload.result.total_pages);
         setTableData(
-          responsePayload.result.page_tickets.map((ticket: TicketSchemaWithoutMessages) => {
-            return {
-              id: ticket.id,
-              user: ticket.username,
-              task: ticket.request,
-              status: ticket.status,
-            };
-          })
+          responsePayload.result.page_tickets
         );
       }
     } catch (error) {
@@ -192,14 +186,7 @@ export default function TicketsPage(): ReactElement {
 
         setTotalPage(responsePayload.result.total_pages);
         setTableData(
-          responsePayload.result.page_tickets.map((ticket: TicketSchemaWithoutMessages) => {
-            return {
-              id: ticket.id,
-              user: ticket.username,
-              task: ticket.request,
-              status: ticket.status,
-            };
-          })
+          responsePayload.result.page_tickets
         );
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -217,6 +204,11 @@ export default function TicketsPage(): ReactElement {
   useEffect(() => {
     scrollToBottom();
   }, [targetTicketMessages]);
+  useEffect(() => {
+    console.log(selectedTicket)
+  }, [selectedTicket]);
+
+
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -297,7 +289,11 @@ export default function TicketsPage(): ReactElement {
             padding={"13px"}
           >
             <Box display={"flex"}>
-              <AccountCircleOutlinedIcon sx={{ fontSize: 20 }} />
+              {
+                selectedTicket
+                ? <Image src={selectedTicket.avatar} alt={'avatar'}  width={24} height={24} className={'rounded-full'}/>
+                : <AccountCircleOutlinedIcon sx={{ fontSize: 20 }} />
+              }
               <Typography marginLeft={"10px"}>{ticketUsername}</Typography>
             </Box>
 

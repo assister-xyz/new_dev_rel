@@ -14,9 +14,11 @@ import FileCard from "@/components/FileCard";
 import AddFileCard from "@/components/AddFileCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {useToast} from "@/components/ui/use-toast";
 
 export default function KnowladgeBasePage(): ReactElement {
-  const [selectedFile, setSelectedFileFile] = useState<File | null>(null);
+  const { toast } = useToast();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileTypeError, setIsFileTypeError] = useState<boolean>(false);
   const [filesData, setFilesData] = useState<EmbeddedFileStatesInterface[]>([]);
 
@@ -24,15 +26,22 @@ export default function KnowladgeBasePage(): ReactElement {
 
   function selectFileHandler(event: ChangeEvent<HTMLInputElement>): void {
     const selectedFile = event.target.files?.[0];
+    console.log(selectedFile)
     if (selectedFile) {
       const fileExtension: string = selectedFile.name.split(".").pop()!.toLowerCase();
       if (!["pdf", "txt"].includes(fileExtension)) {
         setIsFileTypeError(true);
+        setSelectedFile(null)
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: 'Sorry, but we only accept files in TXT or PDF format. The file you attempted to upload is not supported. Please make sure you are uploading a valid TXT or PDF file and try again.',
+        })
       } else {
         // file name already contains the file extension in it as a whole string
         console.log("selectedFileName:", selectedFile.name);
         setIsFileTypeError(false);
-        setSelectedFileFile(selectedFile);
+        setSelectedFile(selectedFile);
       }
     }
   }
@@ -53,7 +62,7 @@ export default function KnowladgeBasePage(): ReactElement {
           throw new Error(responsePayload.result);
         }
 
-        setSelectedFileFile(null);
+        setSelectedFile(null);
         setIsFileTypeError(false);
 
         const getResponse: Response = await getEmbeddedFileRefsApi(client);
@@ -66,7 +75,11 @@ export default function KnowladgeBasePage(): ReactElement {
         setFilesData(responsePayload.result);
       } catch (error: unknown) {
         if (error instanceof Error) {
-          console.log(error.message);
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: error.message,
+          })
         }
       }
     }

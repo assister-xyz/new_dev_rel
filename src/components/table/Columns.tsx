@@ -10,14 +10,16 @@ import {
 	StopwatchIcon,
 	CrossCircledIcon,
 } from "@radix-ui/react-icons"
+import Image from "next/image";
 
 // We're keeping a simple non-relational schema here.
 // IRL, you will have a schema for your data models.
 export const taskSchema = z.object({
-	user: z.string(),
-	task: z.string(),
+	username: z.string(),
+	request: z.string(),
 	status: z.string(),
 	id: z.string(),
+	source: z.string(),
 })
 
 export type Task = z.infer<typeof taskSchema>
@@ -78,16 +80,27 @@ export const statuses = [
 
 export const columns: ColumnDef<Task>[] = [
 	{
-		accessorKey: "user",
+		accessorKey: "username",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="User" />
 		),
-		cell: ({ row }) => <div className="w-[80px]">{row.getValue("user")}</div>,
+		cell: ({ row }) => {
+			return(
+				<div className="w-[80px] flex justify-between items-center">
+					{
+						row.original.source === 'discord'
+						? <Image src={'/logos/discord.svg'} alt={'discord'} width={16} height={12} className={'mr-2'} />
+						: <Image src={'/logos/telegram.svg'} alt={'telegram'} width={16} height={12} className={'mr-2'} />
+					}
+					{row.getValue("username")}
+				</div>
+			)
+		},
 		enableSorting: false,
 		enableHiding: false,
 	},
 	{
-		accessorKey: "task",
+		accessorKey: "request",
 		header: ({ column }) => (
 			<DataTableColumnHeader column={column} title="Task" />
 		),
@@ -95,7 +108,7 @@ export const columns: ColumnDef<Task>[] = [
 			return (
 				<div className="flex space-x-2">
 					<span className="max-w-[400px] font-medium">
-            {row.getValue("task")}
+            {row.getValue("request")}
           </span>
 				</div>
 			)
