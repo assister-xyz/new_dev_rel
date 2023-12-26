@@ -9,10 +9,21 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import MessageCard from "@/components/MessageCard";
 import CustomTextField from "@/components/CustomTextField";
 import { TicketMessagesSchema, TicketResponseMessagesSchema, TicketSchema, TicketSchemaWithoutMessages } from "@/types/apiResponseSchema";
-import { addTicketResponseMessageApi, getTicketsByPageApi, getTicketApi, updateTicketStatusApi } from "@/apis/ticketPage";
+import {
+  addTicketResponseMessageApi,
+  getTicketsByPageApi,
+  getTicketApi,
+  updateTicketStatusApi,
+  addTicketToKnowledgeBaseApi
+} from "@/apis/ticketPage";
 import {Button} from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon, CheckIcon } from "@radix-ui/react-icons";
+import {
+  DotsHorizontalIcon,
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@radix-ui/react-icons";
 import {
   Dialog,
   DialogContent,
@@ -25,9 +36,12 @@ import {
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import Image from "next/image";
+import {useToast} from "@/components/ui/use-toast";
 
 export default function TicketsPage(): ReactElement {
+  const { toast } = useToast();
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [code, setCode] = useState(`
     import os
     import openai
@@ -44,6 +58,7 @@ export default function TicketsPage(): ReactElement {
       presence_penalty=0,
     )               
   `);
+  const [docName, setDocName] = useState<string>('');
 
   const [selectedTicket, setSelectedTicket] = useState<TicketSchemaWithoutMessages | null>(null);
   const [ticketUsername, setTicketUsername] = useState<string>("");
@@ -73,6 +88,33 @@ export default function TicketsPage(): ReactElement {
 
   function scrollToBottom(): void {
     messagesContainerRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  const addTicketToKnowledgeBase = async () => {
+    if (selectedTicket) {
+      try {
+        const getResponse: Response = await addTicketToKnowledgeBaseApi(selectedTicket.id, code, docName);
+
+        if (!getResponse.ok) {
+          const responsePayload: { result: string } = await getResponse.json();
+          throw new Error(responsePayload.result);
+        }
+
+        setIsModalOpen(false)
+        toast({
+          title: "Success!",
+          description: 'Your submission to the Knowledge Base was successful.',
+        })
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: error.message,
+          })
+        }
+      }
+    }
   }
 
   async function addTicketResponseMessageApiHandler(ticketId: string | undefined, messageContent: string): Promise<void> {
@@ -198,9 +240,6 @@ export default function TicketsPage(): ReactElement {
   useEffect(() => {
     scrollToBottom();
   }, [targetTicketMessages]);
-  useEffect(() => {
-    console.log(totalPage)
-  }, [totalPage]);
 
   return (
     <Box className='flex-1 space-y-4 p-8 pt-6'>
@@ -214,18 +253,33 @@ export default function TicketsPage(): ReactElement {
             data={tableData}
             columns={columns}
             getTicketApiHandler={getTicketApiHandler}
-            goToPreviousPageHandler={goToPreviousPageHandler}
-            goToNextPageHandler={goToNextPageHandler}
             setSelectedTicket={setSelectedTicket}
             setTableData={setTableData}
+            setCurrentPage={setCurrentPage}
           />
-
+          <div className='flex flex-row-reverse items-center justify-between mt-2'>
+            <div className='flex items-center space-x-6 lg:space-x-8'>
+              <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
+                Page {currentPage} of {totalPage}
+              </div>
+              <div className='flex items-center space-x-2'>
+                <Button variant='outline' className='h-8 w-8 p-0' onClick={goToPreviousPageHandler}>
+                  <span className='sr-only'>Go to previous page</span>
+                  <ChevronLeftIcon className='h-4 w-4'/>
+                </Button>
+                <Button variant='outline' className='h-8 w-8 p-0' onClick={goToNextPageHandler}>
+                  <span className='sr-only'>Go to next page</span>
+                  <ChevronRightIcon className='h-4 w-4'/>
+                </Button>
+              </div>
+            </div>
+          </div>
           {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
           {/* ticket page navigation handle */}
 
         </Box>
         {/* Ticket response containers */}
-        <Box width={"100%"} className='col-span-2 mt-[59px]'>
+        <Box width={"100%"} className='col-span-2 mt-[48px]'>
           <Box
             className={`rounded-t-md border border-input`}
             display={"flex"}
@@ -236,15 +290,16 @@ export default function TicketsPage(): ReactElement {
             <Box display={"flex"}>
               {
                 selectedTicket
-                ? <Image src={selectedTicket.avatar} alt={'avatar'}  width={24} height={24} className={'rounded-full'}/>
-                : <AccountCircleOutlinedIcon sx={{ fontSize: 20 }} />
+                  ?
+                  <Image src={selectedTicket.avatar} alt={'avatar'} width={24} height={24} className={'rounded-full'}/>
+                  : <AccountCircleOutlinedIcon sx={{fontSize: 20}}/>
               }
               <Typography marginLeft={"10px"}>{ticketUsername}</Typography>
             </Box>
 
             {targetTicketMessages.length !== 0 &&
               <Box className='flex items-center'>
-                <Dialog>
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                   <DialogTrigger asChild>
                     <Button
                       size='xs'
@@ -257,14 +312,15 @@ export default function TicketsPage(): ReactElement {
                     <DialogHeader>
                       <DialogTitle>Add to Knowledge Base</DialogTitle>
                       <DialogDescription>
-                        Please check content before adding to Knowledge Base. New data source will be in added as separated txt file.
+                        Please check content before adding to Knowledge Base. New data source will be in added as
+                        separated txt file.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <CodeEditor
                         value={code}
                         language="js"
-                        placeholder="Please enter JS code."
+                        placeholder="Please enter code."
                         onChange={(evn) => setCode(evn.target.value)}
                         padding={15}
                         style={{
@@ -282,11 +338,13 @@ export default function TicketsPage(): ReactElement {
                         <Input
                           id="taskName"
                           placeholder={'ticket #12412'}
+                          value={docName}
+                          onChange={(e) => setDocName(e.target.value)}
                         />
                       </div>
                     </div>
                     <DialogFooter className='sm:justify-start'>
-                      <Button type="submit">Save</Button>
+                      <Button type="submit" disabled={!docName || !code} onClick={addTicketToKnowledgeBase}>Save</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>

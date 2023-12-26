@@ -48,3 +48,15 @@ export async function searchTickets(query: string, clientName: string,): Promise
   });
   return response;
 }
+
+export async function addTicketToKnowledgeBaseApi(id: string, code: string, docName: string,): Promise<Response> {
+  const response: Response = await fetch(`${DOMAIN}/api/tickets/knowledge`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({id, code, docName})
+  });
+  return response;
+}
+
