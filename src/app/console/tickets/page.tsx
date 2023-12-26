@@ -9,7 +9,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import MessageCard from "@/components/MessageCard";
 import CustomTextField from "@/components/CustomTextField";
 import { TicketMessagesSchema, TicketResponseMessagesSchema, TicketSchema, TicketSchemaWithoutMessages } from "@/types/apiResponseSchema";
-import { addTicketResponseMessageApi, getOpenTicketsByPageApi, getTicketApi, updateTicketStatusApi } from "@/apis/ticketPage";
+import { addTicketResponseMessageApi, getTicketsByPageApi, getTicketApi, updateTicketStatusApi } from "@/apis/ticketPage";
 import {Button} from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon, CheckIcon } from "@radix-ui/react-icons";
@@ -45,7 +45,6 @@ export default function TicketsPage(): ReactElement {
     )               
   `);
 
-  const [selectedSource, setSelectedSource] = useState<string>("discord");
   const [selectedTicket, setSelectedTicket] = useState<TicketSchemaWithoutMessages | null>(null);
   const [ticketUsername, setTicketUsername] = useState<string>("");
 
@@ -70,11 +69,6 @@ export default function TicketsPage(): ReactElement {
     if (currentPage > 1) {
       setCurrentPage((prevPage) => prevPage - 1);
     }
-  }
-
-  function setSelectedSourceHandler(targetSource: string): void {
-    setSelectedSource(targetSource);
-    setCurrentPage(1);
   }
 
   function scrollToBottom(): void {
@@ -120,7 +114,7 @@ export default function TicketsPage(): ReactElement {
     }
   }
 
-  async function updateTicketStatusApiHandler(ticketId: string, status: string, source: string, page: number): Promise<void> {
+  async function updateTicketStatusApiHandler(ticketId: string, status: string, page: number): Promise<void> {
     try {
       const putResponse: Response = await updateTicketStatusApi(ticketId, status);
       if (putResponse.ok === false) {
@@ -132,7 +126,7 @@ export default function TicketsPage(): ReactElement {
 
       const clientName: string | null = localStorage.getItem("client");
       if (clientName) {
-        const getResponse: Response = await getOpenTicketsByPageApi(source, clientName, page);
+        const getResponse: Response = await getTicketsByPageApi(clientName, page);
         if (getResponse.ok === false) {
           const responsePayload: { result: string } = await getResponse.json();
           throw new Error(responsePayload.result);
@@ -172,12 +166,12 @@ export default function TicketsPage(): ReactElement {
   }
 
   useEffect(() => {
-    async function getOpenTicketsByPageApiHandler(source: string, clientName: string, page: number): Promise<void> {
+    async function getOpenTicketsByPageApiHandler(clientName: string, page: number): Promise<void> {
       console.log("getOpenTicketsByPageApiHandler runs");
 
       try {
-        const getResponse: Response = await getOpenTicketsByPageApi(source, clientName, page);
-        if (getResponse.ok === false) {
+        const getResponse: Response = await getTicketsByPageApi(clientName, page);
+        if (!getResponse.ok) {
           const responsePayload: { result: string } = await getResponse.json();
           throw new Error(responsePayload.result);
         }
@@ -197,20 +191,16 @@ export default function TicketsPage(): ReactElement {
 
     const clientName: string | null = localStorage.getItem("client");
     if (clientName) {
-      getOpenTicketsByPageApiHandler(selectedSource, clientName, currentPage);
+      getOpenTicketsByPageApiHandler(clientName, currentPage);
     }
-  }, [selectedSource, currentPage]);
+  }, [currentPage]);
 
   useEffect(() => {
     scrollToBottom();
   }, [targetTicketMessages]);
   useEffect(() => {
-    console.log(selectedTicket)
-  }, [selectedTicket]);
-
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    console.log(totalPage)
+  }, [totalPage]);
 
   return (
     <Box className='flex-1 space-y-4 p-8 pt-6'>
@@ -219,53 +209,7 @@ export default function TicketsPage(): ReactElement {
       </Box>
       <Box className='grid gap-4 grid-cols-4'>
         <Box className='col-span-2'>
-          {/* ---------------------------------------------------------------------------------------------------------------------------------------- */}
-          {/* ticket source selector */}
-          <Box display={"flex"} marginBottom={"15px"}>
-            <Box
-              onClick={() => setSelectedSourceHandler("discord")}
-              paddingX={"15px"}
-              paddingY={"10px"}
-              bgcolor={selectedSource === "discord" ? "black" : ""}
-              borderRadius={"15px"}
-              border={1}
-              display={"inline-block"}
-              marginRight={"15px"}
-              sx={{
-                "&:hover": {
-                  cursor: "pointer",
-                  opacity: "0.8",
-                },
-              }}
-            >
-              <Typography variant='h6' color={selectedSource === "discord" ? "white" : "black"} component={"span"}>
-                Discord
-              </Typography>
-            </Box>
-            <Box
-              onClick={() => setSelectedSourceHandler("telegram")}
-              paddingX={"15px"}
-              paddingY={"10px"}
-              bgcolor={selectedSource === "telegram" ? "black" : ""}
-              borderRadius={"15px"}
-              border={1}
-              display={"inline-block"}
-              sx={{
-                "&:hover": {
-                  cursor: "pointer",
-                  opacity: "0.8",
-                },
-              }}
-            >
-              <Typography variant='h6' color={selectedSource === "telegram" ? "white" : "black"} component={"span"}>
-                Telegram
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
           {/* tickets */}
-
           <DataTable
             data={tableData}
             columns={columns}
@@ -273,6 +217,7 @@ export default function TicketsPage(): ReactElement {
             goToPreviousPageHandler={goToPreviousPageHandler}
             goToNextPageHandler={goToNextPageHandler}
             setSelectedTicket={setSelectedTicket}
+            setTableData={setTableData}
           />
 
           {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
@@ -357,7 +302,7 @@ export default function TicketsPage(): ReactElement {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-[160px]">
                     <DropdownMenuItem
-                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "open", selectedSource, currentPage)}
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "open", currentPage)}
                     >
                       Open
                       {
@@ -365,7 +310,7 @@ export default function TicketsPage(): ReactElement {
                       }
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "in progress", selectedSource, currentPage)}
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "in progress", currentPage)}
                     >
                       In Progress
                       {
@@ -373,7 +318,7 @@ export default function TicketsPage(): ReactElement {
                       }
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "closed", selectedSource, currentPage)}
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "closed", currentPage)}
                     >
                       Closed
                       {
@@ -381,7 +326,7 @@ export default function TicketsPage(): ReactElement {
                       }
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "other", selectedSource, currentPage)}
+                      onClick={() => updateTicketStatusApiHandler(targetTicketMessages[0]?.ticketId, "other", currentPage)}
                     >
                       Other
                       {

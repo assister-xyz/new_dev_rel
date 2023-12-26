@@ -27,9 +27,10 @@ interface DataTableProps<TData, TValue> {
   goToNextPageHandler: Function;
   goToPreviousPageHandler: Function;
   setSelectedTicket: Function;
+  setTableData: Function;
 }
 
-export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, goToPreviousPageHandler, goToNextPageHandler, setSelectedTicket}: DataTableProps<TData, TValue>): React.JSX.Element {
+export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, goToPreviousPageHandler, goToNextPageHandler, setSelectedTicket, setTableData}: DataTableProps<TData, TValue>): React.JSX.Element {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -59,7 +60,7 @@ export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, g
 
   return (
     <div className='space-y-4'>
-      {/* <DataTableToolbar table={table} /> */}
+      <DataTableToolbar table={table} setTableData={setTableData }/>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
