@@ -22,8 +22,9 @@ export function DataTableToolbar<TData>({
                                         }: DataTableToolbarProps<TData>) {
 
 	const [value, setValue] = useState<string>('')
+	const [clientName, setClientName] = useState<string | null>(null)
 	const debouncedValue = useDebounce<string>(value, 500)
-	const clientName: string | null = localStorage.getItem("client");
+
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setValue(event.target.value)
@@ -58,6 +59,8 @@ export function DataTableToolbar<TData>({
 						responsePayload.result.page_tickets
 					);
 				}
+			}else {
+				setClientName(localStorage.getItem("client"))
 			}
 		}
 		searchTicketsHandler()
