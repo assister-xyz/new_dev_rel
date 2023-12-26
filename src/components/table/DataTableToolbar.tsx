@@ -1,52 +1,80 @@
 "use client"
 
-import { Cross2Icon } from "@radix-ui/react-icons"
 import { Table } from "@tanstack/react-table"
 
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-import { DataTableFacetedFilter } from "./DataTableFacetedFilter"
-import {statuses} from "@/components/table/Columns";
+import {getTicketsByPageApi, searchTickets} from "@/apis/ticketPage";
+import {ChangeEvent, useEffect, useState} from "react";
+import {useDebounce} from "@/hooks/useDebounce";
+import {TicketSchemaWithoutMessages} from "@/types/apiResponseSchema";
+import {Box} from "@mui/material";
 
 interface DataTableToolbarProps<TData> {
-	table: Table<TData>
+	table: Table<TData>,
+	setTableData: Function
+	setCurrentPage: Function
 }
 
 export function DataTableToolbar<TData>({
 	                                        table,
+	                                        setTableData,
+	                                        setCurrentPage
                                         }: DataTableToolbarProps<TData>) {
-	const isFiltered = table.getState().columnFilters.length > 0
+
+	const [value, setValue] = useState<string>('')
+	const [clientName, setClientName] = useState<string | null>(null)
+	const debouncedValue = useDebounce<string>(value, 500)
+
+
+	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setValue(event.target.value)
+	}
+
+	useEffect(() => {
+		const searchTicketsHandler = async () => {
+			if (clientName) {
+				setCurrentPage(1);
+
+				if (value.length > 0) {
+					const getResponse: Response = await searchTickets(value, clientName);
+					if (!getResponse.ok) {
+						const responsePayload: { result: string } = await getResponse.json();
+						throw new Error(responsePayload.result);
+					}
+
+					const responsePayload: { result: TicketSchemaWithoutMessages[] } = await getResponse.json();
+					setTableData(
+						responsePayload.result
+					);
+				}else {
+					const getResponse: Response = await getTicketsByPageApi(clientName, 1);
+					if (!getResponse.ok) {
+						const responsePayload: { result: string } = await getResponse.json();
+						throw new Error(responsePayload.result);
+					}
+
+					const responsePayload: { result: { page_tickets: TicketSchemaWithoutMessages[]; total_pages: number } } = await getResponse.json();
+
+					setTableData(
+						responsePayload.result.page_tickets
+					);
+				}
+			}else {
+				setClientName(localStorage.getItem("client"))
+			}
+		}
+		searchTicketsHandler()
+	}, [debouncedValue])
 
 	return (
-		<div className="flex items-center justify-between">
-			<div className="flex flex-1 items-center space-x-2">
+		<Box className="flex items-center justify-between">
+			<Box className="flex flex-1 items-center space-x-2">
 				<Input
-					placeholder="Filter tasks..."
-					value={(table.getColumn("task")?.getFilterValue() as string) ?? ""}
-					onChange={(event) =>
-						table.getColumn("task")?.setFilterValue(event.target.value)
-					}
+					placeholder="Search"
+					onChange={handleChange}
 					className="h-8 w-[150px] lg:w-[250px]"
 				/>
-				{table.getColumn("status") && (
-					<DataTableFacetedFilter
-						column={table.getColumn("status")}
-						title="Status"
-						options={statuses}
-					/>
-				)}
-				{isFiltered && (
-					<Button
-						variant="ghost"
-						onClick={() => table.resetColumnFilters()}
-						className="h-8 px-2 lg:px-3"
-					>
-						Reset
-						<Cross2Icon className="ml-2 h-4 w-4" />
-					</Button>
-				)}
-			</div>
-		</div>
+			</Box>
+		</Box>
 	)
 }

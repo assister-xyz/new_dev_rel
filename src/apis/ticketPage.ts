@@ -1,8 +1,8 @@
 import { DOMAIN } from "@/constants/domains";
 import { TicketResponseMessagesSchema } from "@/types/apiResponseSchema";
 
-export async function getOpenTicketsByPageApi(source: string, clientName: string, page: number): Promise<Response> {
-  const response: Response = await fetch(`${DOMAIN}/api/tickets/?source=${source}&client-name=${clientName}&page=${page}`, {
+export async function getTicketsByPageApi(clientName: string, page: number): Promise<Response> {
+  const response: Response = await fetch(`${DOMAIN}/api/tickets/?client-name=${clientName}&page=${page}`, {
     method: "GET",
   });
   return response;
@@ -37,3 +37,26 @@ export async function updateTicketStatusApi(ticketId: string, status: string): P
   });
   return response;
 }
+
+export async function searchTickets(query: string, clientName: string,): Promise<Response> {
+  const response: Response = await fetch(`${DOMAIN}/api/tickets/search`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({query: query, client: clientName})
+  });
+  return response;
+}
+
+export async function addTicketToKnowledgeBaseApi(id: string, code: string, docName: string,): Promise<Response> {
+  const response: Response = await fetch(`${DOMAIN}/api/tickets/knowledge`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({id, code, docName})
+  });
+  return response;
+}
+

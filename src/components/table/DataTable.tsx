@@ -17,19 +17,18 @@ import {
 } from "@tanstack/react-table";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: any[];
   getTicketApiHandler: any;
-  goToNextPageHandler: Function;
-  goToPreviousPageHandler: Function;
   setSelectedTicket: Function;
+  setTableData: Function;
+  setCurrentPage: Function;
 }
 
-export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, goToPreviousPageHandler, goToNextPageHandler, setSelectedTicket}: DataTableProps<TData, TValue>): React.JSX.Element {
+export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, setSelectedTicket, setTableData, setCurrentPage}: DataTableProps<TData, TValue>): React.JSX.Element {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -59,7 +58,7 @@ export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, g
 
   return (
     <div className='space-y-4'>
-      {/* <DataTableToolbar table={table} /> */}
+      <DataTableToolbar table={table} setTableData={setTableData} setCurrentPage={setCurrentPage}/>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
@@ -102,11 +101,6 @@ export function DataTable<TData, TValue>({ columns, data, getTicketApiHandler, g
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination
-        table={table}
-        goToPreviousPageHandler={goToPreviousPageHandler}
-        goToNextPageHandler={goToNextPageHandler}
-      />
     </div>
   );
 }
