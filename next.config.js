@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: 'cdn.discordapp.com',
         port: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'vinicius73.github.io',
+        port: '',
+      },
     ],
   },
 }

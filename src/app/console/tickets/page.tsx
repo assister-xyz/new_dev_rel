@@ -61,7 +61,6 @@ export default function TicketsPage(): ReactElement {
   const [docName, setDocName] = useState<string>('');
 
   const [selectedTicket, setSelectedTicket] = useState<TicketSchemaWithoutMessages | null>(null);
-  const [ticketUsername, setTicketUsername] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
@@ -70,9 +69,6 @@ export default function TicketsPage(): ReactElement {
   const [tableData, setTableData] = useState<TicketSchemaWithoutMessages[]>([]);
 
   // ----------------------------------------------------------------------------------------------------------------------------
-  function setTicketUsernameHandler(username: string): void {
-    setTicketUsername(username);
-  }
 
   function goToNextPageHandler(): void {
     if (currentPage < totalPage) {
@@ -198,7 +194,6 @@ export default function TicketsPage(): ReactElement {
       }
       // when no error, we process response payload then parse it to update the target ticket messages state
       const responsePayload: { result: TicketSchema } = await getResponse.json();
-      setTicketUsernameHandler(responsePayload.result.username);
       setTargetTicketMessages(responsePayload.result.messages);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -240,6 +235,10 @@ export default function TicketsPage(): ReactElement {
   useEffect(() => {
     scrollToBottom();
   }, [targetTicketMessages]);
+
+  useEffect(() => {
+    console.log(selectedTicket)
+  }, [selectedTicket]);
 
   return (
     <Box className='flex-1 space-y-4 p-8 pt-6'>
@@ -294,7 +293,7 @@ export default function TicketsPage(): ReactElement {
                   <Image src={selectedTicket.avatar} alt={'avatar'} width={24} height={24} className={'rounded-full'}/>
                   : <AccountCircleOutlinedIcon sx={{fontSize: 20}}/>
               }
-              <Typography marginLeft={"10px"}>{ticketUsername}</Typography>
+              <Typography marginLeft={"10px"}>{selectedTicket?.username}</Typography>
             </Box>
 
             {targetTicketMessages.length !== 0 &&
@@ -332,7 +331,7 @@ export default function TicketsPage(): ReactElement {
                         }}
                       />
                       <div>
-                        <Label htmlFor="username" className="text-right">
+                        <Label htmlFor="taskName" className="text-right">
                           Doc Name
                         </Label>
                         <Input

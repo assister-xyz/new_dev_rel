@@ -56,6 +56,11 @@ export const statuses = [
 		icon: CircleIcon,
 	},
 	{
+		value: "closed",
+		label: "Closed",
+		icon: CrossCircledIcon,
+	},
+	{
 		value: "in progress",
 		label: "In Progress",
 		icon: StopwatchIcon,
