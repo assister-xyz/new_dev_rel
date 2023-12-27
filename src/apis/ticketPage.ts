@@ -2,7 +2,7 @@ import { DOMAIN } from "@/constants/domains";
 import { TicketResponseMessagesSchema } from "@/types/apiResponseSchema";
 
 export async function getTicketsByPageApi(clientName: string, page: number): Promise<Response> {
-  const response: Response = await fetch(`${DOMAIN}/api/tickets/?client-name=${clientName}&page=${page}`, {
+  const response: Response = await fetch(`${DOMAIN}/api/tickets/?client-name=${clientName}&page=${page}&mode=all`, {
     method: "GET",
   });
   return response;
