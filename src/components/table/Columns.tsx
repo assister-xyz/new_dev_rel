@@ -41,16 +41,6 @@ export const labels = [
 
 export const statuses = [
 	{
-		value: "backlog",
-		label: "Backlog",
-		icon: QuestionMarkCircledIcon,
-	},
-	{
-		value: "todo",
-		label: "Todo",
-		icon: CircleIcon,
-	},
-	{
 		value: "open",
 		label: "Open",
 		icon: CircleIcon,
@@ -66,20 +56,14 @@ export const statuses = [
 		icon: StopwatchIcon,
 	},
 	{
-		value: "done",
-		label: "Done",
-		icon: CheckCircledIcon,
-
-	},
-	{
-		value: "canceled",
-		label: "Canceled",
-		icon: CrossCircledIcon,
-	},
-	{
-		value: "added to KB",
+		value: "knowledge added",
 		label: "Added to KB",
 		icon: CheckCircledIcon,
+	},
+	{
+		value: "other",
+		label: "Other",
+		icon: CircleIcon,
 	},
 ]
 
@@ -91,7 +75,7 @@ export const columns: ColumnDef<Task>[] = [
 		),
 		cell: ({ row }) => {
 			return(
-				<div className="w-[80px] flex justify-between items-center">
+				<div className="w-[90px] flex justify-between items-center">
 					{
 						row.original.source === 'discord'
 						? <Image src={'/logos/discord.svg'} alt={'discord'} width={16} height={12} className={'mr-2'} />
@@ -136,7 +120,7 @@ export const columns: ColumnDef<Task>[] = [
 			}
 
 			return (
-				<div className="flex w-[120px] items-center whitespace-nowrap">
+				<div className="flex w-[110px] items-center whitespace-nowrap">
 					{status.icon && (
 						<status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
 					)}

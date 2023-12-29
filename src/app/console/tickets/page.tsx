@@ -236,17 +236,13 @@ export default function TicketsPage(): ReactElement {
     scrollToBottom();
   }, [targetTicketMessages]);
 
-  useEffect(() => {
-    console.log(selectedTicket)
-  }, [selectedTicket]);
-
   return (
     <Box className='flex-1 space-y-4 p-8 pt-6'>
       <Box className='flex items-center justify-between space-y-2'>
         <h2 className='text-3xl font-bold tracking-tight'>Tickets</h2>
       </Box>
-      <Box className='grid gap-4 grid-cols-4'>
-        <Box className='col-span-2'>
+      <Box className='grid gap-4 grid-cols-2 lg:grid-cols-4'>
+        <Box className='col-span-2 order-last lg:order-first'>
           {/* tickets */}
           <DataTable
             data={tableData}
@@ -273,9 +269,6 @@ export default function TicketsPage(): ReactElement {
               </div>
             </div>
           </div>
-          {/* -------------------------------------------------------------------------------------------------------------------------------------------- */}
-          {/* ticket page navigation handle */}
-
         </Box>
         {/* Ticket response containers */}
         <Box width={"100%"} className='col-span-2 mt-[48px]'>
