@@ -6,14 +6,11 @@ import { z } from "zod"
 import {
 	CheckCircledIcon,
 	CircleIcon,
-	QuestionMarkCircledIcon,
 	StopwatchIcon,
 	CrossCircledIcon,
 } from "@radix-ui/react-icons"
 import Image from "next/image";
 
-// We're keeping a simple non-relational schema here.
-// IRL, you will have a schema for your data models.
 export const taskSchema = z.object({
 	username: z.string(),
 	request: z.string(),

@@ -13,8 +13,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import SpinnerLoading from "@/components/SpinnerLoading";
-import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function DashboardPage(): ReactElement {
   const router: AppRouterInstance = useRouter();
@@ -52,6 +51,8 @@ export default function DashboardPage(): ReactElement {
         // when no error, we process response payload then parse --> update all states using the response payload
 
         const responsePayload: { result: DashBoardDataSchema } = await getResponse.json();
+        console.log('responsePayload',responsePayload)
+
 
         setUserStatsCardStates({ value: responsePayload.result.current_period_unique_user_count, percentChange: responsePayload.result.unique_user_percent_change });
         setQueryStatsCardStates({ value: responsePayload.result.current_period_total_queries_count, percentChange: responsePayload.result.queries_percent_change });

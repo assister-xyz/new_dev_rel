@@ -1,26 +1,39 @@
 "use client";
 
-import { greenLightColor, majorCardBgColor, redLightColor } from "@/themes/colors";
-import { loginCheckHandler } from "@/utils/auth";
-import { navigationHandler } from "@/utils/nav";
-import { Box, Grid, Typography } from "@mui/material";
+import { greenLightColor, redLightColor } from "@/themes/colors";
+import { Box } from "@mui/material";
 import React, { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { EmbeddedFileStatesInterface, SourceBotCardStatesInterface } from "@/types/states";
 import { deleteEmbeddedFileApi, embeddAndStoreFileApi, getEmbeddedFileRefsApi } from "@/apis/knowledgePage";
 import FileCard from "@/components/FileCard";
 import AddFileCard from "@/components/AddFileCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {useToast} from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
-export default function KnowladgeBasePage(): ReactElement {
+export default function KnowledgeBasePage(): ReactElement {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileTypeError, setIsFileTypeError] = useState<boolean>(false);
   const [filesData, setFilesData] = useState<EmbeddedFileStatesInterface[]>([]);
+  const [discordBotCardStates, setDiscordBotCardStates] = useState<SourceBotCardStatesInterface>({
+    lastQueryDatetime: "--",
+    isOnline: false,
+    openTicketsCount: "--",
+  });
+
+  const [telegramBotCardStates, setTelegramBotCardStates] = useState<SourceBotCardStatesInterface>({
+    lastQueryDatetime: "--",
+    isOnline: false,
+    openTicketsCount: "--",
+  });
+
+  const [mainSiteBotCardStates, setMainSiteBotCardStates] = useState<SourceBotCardStatesInterface>({
+    lastQueryDatetime: "--",
+    isOnline: false,
+    openTicketsCount: "--",
+  });
 
   // -----------------------------------------------------------------------------------------------------------------
 
@@ -112,34 +125,29 @@ export default function KnowladgeBasePage(): ReactElement {
 
   // -----------------------------------------------------------------------------------------------------------------
 
-  // useEffect(() => {
-  //   async function getEmbeddedFilesOnNav(client: string): Promise<void> {
-  //     console.log("getEmbeddedFilesOnNav runs");
-  //
-  //     try {
-  //       const getResponse: Response = await getEmbeddedFileRefsApi(client);
-  //       if (getResponse.ok === false) {
-  //         const responsePayload: { result: string } = await getResponse.json();
-  //         throw new Error(responsePayload.result);
-  //       }
-  //
-  //       const responsePayload: { result: EmbeddedFileStatesInterface[] } = await getResponse.json();
-  //       setFilesData(responsePayload.result);
-  //     } catch (error: unknown) {
-  //       if (error instanceof Error) {
-  //         console.log(error.message);
-  //       }
-  //     }
-  //   }
-  //
-  //   const authCheckResult: string = loginCheckHandler();
-  //   if (authCheckResult === "unauthorized") {
-  //     navigationHandler("/", router);
-  //   } else {
-  //     const clientName: string = localStorage.getItem("client")!;
-  //     getEmbeddedFilesOnNav(clientName);
-  //   }
-  // }, []);
+  useEffect(() => {
+    async function getEmbeddedFilesOnNav(client: string): Promise<void> {
+      console.log("getEmbeddedFilesOnNav runs");
+
+      try {
+        const getResponse: Response = await getEmbeddedFileRefsApi(client);
+        if (getResponse.ok === false) {
+          const responsePayload: { result: string } = await getResponse.json();
+          throw new Error(responsePayload.result);
+        }
+
+        const responsePayload: { result: EmbeddedFileStatesInterface[] } = await getResponse.json();
+        setFilesData(responsePayload.result);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.log(error.message);
+        }
+      }
+    }
+
+    const clientName: string = localStorage.getItem("client")!;
+    getEmbeddedFilesOnNav(clientName);
+  }, []);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
@@ -153,74 +161,68 @@ export default function KnowladgeBasePage(): ReactElement {
           <FileCard key={index} {...file} deleteTargetFileHandler={deleteTargetFileHandler} />
         ))}
       </Box>
-      {/*<Box className='grid gap-6 grid-cols-2'>*/}
-      {/*  <Card>*/}
-      {/*    <CardHeader className="space-y-0 pb-2">*/}
-      {/*      <CardTitle className="flex justify-between text-sm font-medium">*/}
-      {/*        Bot`s perfomance*/}
-      {/*      </CardTitle>*/}
-      {/*      <CardDescription>1,042 queries were solved this week.</CardDescription>*/}
-      {/*    </CardHeader>*/}
-      {/*    <CardContent>*/}
-      {/*      <Box className="grid gap-6">*/}
-      {/*        <Box className="flex items-center justify-between space-x-4">*/}
-      {/*          <Box className='rounded-full bg-[#D9D9D9] p-1'>*/}
-      {/*            <Image src='/logos/discord.png' alt='logo' width={32} height={32} />*/}
-      {/*          </Box>*/}
-      {/*            <Box className='flex-1 ml-2'>*/}
-      {/*              <p className="text-sm font-medium leading-none">*/}
-      {/*                DS client*/}
-      {/*              </p>*/}
-      {/*              <p className="text-sm text-muted-foreground">queries</p>*/}
-      {/*            </Box>*/}
-      {/*            <p className="text-sm font-medium">*/}
-      {/*              {discordBotCardStates.openTicketsCount} tickets*/}
-      {/*            </p>*/}
-      {/*            <li*/}
-      {/*                style={{*/}
-      {/*                  color: discordBotCardStates.isOnline ? greenLightColor : redLightColor,*/}
-      {/*                }}*/}
-      {/*            >*/}
-      {/*              {discordBotCardStates.isOnline ? 'online' : 'offline'}*/}
-      {/*            </li>*/}
-      {/*        </Box>*/}
-      {/*        <Box className="flex items-center justify-between space-x-4">*/}
-      {/*          <Box className='rounded-full bg-[#D9D9D9] p-1'>*/}
-      {/*            <Image src='/logos/telegram.png' alt='logo' width={32} height={32} />*/}
-      {/*          </Box>*/}
-      {/*          <Box className='flex-1 ml-2'>*/}
-      {/*            <p className="text-sm font-medium leading-none">*/}
-      {/*              TG client*/}
-      {/*            </p>*/}
-      {/*            <p className="text-sm text-muted-foreground">queries</p>*/}
-      {/*          </Box>*/}
-      {/*          <p className="text-sm font-medium">*/}
-      {/*            {telegramBotCardStates.openTicketsCount} tickets*/}
-      {/*          </p>*/}
-      {/*          <li*/}
-      {/*            style={{*/}
-      {/*              color: telegramBotCardStates.isOnline ? greenLightColor : redLightColor,*/}
-      {/*            }}*/}
-      {/*          >*/}
-      {/*            {telegramBotCardStates.isOnline ? 'online' : 'offline'}*/}
-      {/*          </li>*/}
-      {/*        </Box>*/}
-      {/*        <Box className="flex items-center justify-between space-x-4">*/}
-      {/*          <Box className='rounded-full bg-[#D9D9D9] p-1'>*/}
-      {/*            <Image src='/logos/main_site.png' alt='logo' width={32} height={32} />*/}
-      {/*          </Box>*/}
-      {/*          <Box className='flex-1 ml-2'>*/}
-      {/*            <p className="text-sm font-medium leading-none">*/}
-      {/*              Main Site*/}
-      {/*            </p>*/}
-      {/*            <p className="text-sm text-muted-foreground">queries</p>*/}
-      {/*          </Box>*/}
-      {/*          <Button variant="secondary">Set Up</Button>*/}
-      {/*        </Box>*/}
-      {/*      </Box>*/}
-      {/*    </CardContent>*/}
-      {/*  </Card>*/}
-      {/*</Box>*/}
+      <Box className='grid gap-6 grid-cols-2'>
+        <Card>
+          <CardHeader className="space-y-0 pb-2">
+            <CardTitle className="flex justify-between text-sm font-medium">
+              Bot`s Performance
+            </CardTitle>
+            <CardDescription>1,042 queries were solved this week.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Box className="grid gap-6">
+              <Box className="flex items-center justify-between space-x-4">
+                  <Image src='/logos/discord_circle.svg' alt='logo' width={40} height={40} />
+                  <Box className='flex-1 ml-2'>
+                    <p className="text-sm font-medium leading-none">
+                      DS client
+                    </p>
+                    <p className="text-sm text-muted-foreground">queries</p>
+                  </Box>
+                  <p className="text-sm font-medium">
+                    {discordBotCardStates.openTicketsCount} tickets
+                  </p>
+                  <li
+                      style={{
+                        color: discordBotCardStates.isOnline ? greenLightColor : redLightColor,
+                      }}
+                  >
+                    {discordBotCardStates.isOnline ? 'online' : 'offline'}
+                  </li>
+              </Box>
+              <Box className="flex items-center justify-between space-x-4">
+                <Image src='/logos/telegram_circle.svg' alt='logo' width={40} height={40} />
+                <Box className='flex-1 ml-2'>
+                  <p className="text-sm font-medium leading-none">
+                    TG client
+                  </p>
+                  <p className="text-sm text-muted-foreground">queries</p>
+                </Box>
+                <p className="text-sm font-medium">
+                  {telegramBotCardStates.openTicketsCount} tickets
+                </p>
+                <li
+                  style={{
+                    color: telegramBotCardStates.isOnline ? greenLightColor : redLightColor,
+                  }}
+                >
+                  {telegramBotCardStates.isOnline ? 'online' : 'offline'}
+                </li>
+              </Box>
+              <Box className="flex items-center justify-between space-x-4">
+                <Image src='/logos/web.svg' alt='logo' width={40} height={40} />
+                <Box className='flex-1 ml-2'>
+                  <p className="text-sm font-medium leading-none">
+                    Main Site
+                  </p>
+                  <p className="text-sm text-muted-foreground">queries</p>
+                </Box>
+                <Button variant="secondary">Set Up</Button>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
     </Box>
   );
 }

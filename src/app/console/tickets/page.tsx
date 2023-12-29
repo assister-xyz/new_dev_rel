@@ -16,7 +16,7 @@ import {
   updateTicketStatusApi,
   addTicketToKnowledgeBaseApi
 } from "@/apis/ticketPage";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
   DotsHorizontalIcon,
@@ -33,10 +33,10 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import {useToast} from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function TicketsPage(): ReactElement {
   const { toast } = useToast();
@@ -252,12 +252,12 @@ export default function TicketsPage(): ReactElement {
             setTableData={setTableData}
             setCurrentPage={setCurrentPage}
           />
-          <div className='flex flex-row-reverse items-center justify-between mt-2'>
-            <div className='flex items-center space-x-6 lg:space-x-8'>
-              <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
+          <Box className='flex flex-row-reverse items-center justify-between mt-2'>
+            <Box className='flex items-center space-x-6 lg:space-x-8'>
+              <Box className='flex w-[100px] items-center justify-center text-sm font-medium'>
                 Page {currentPage} of {totalPage}
-              </div>
-              <div className='flex items-center space-x-2'>
+              </Box>
+              <Box className='flex items-center space-x-2'>
                 <Button variant='outline' className='h-8 w-8 p-0' onClick={goToPreviousPageHandler}>
                   <span className='sr-only'>Go to previous page</span>
                   <ChevronLeftIcon className='h-4 w-4'/>
@@ -266,9 +266,9 @@ export default function TicketsPage(): ReactElement {
                   <span className='sr-only'>Go to next page</span>
                   <ChevronRightIcon className='h-4 w-4'/>
                 </Button>
-              </div>
-            </div>
-          </div>
+              </Box>
+            </Box>
+          </Box>
         </Box>
         {/* Ticket response containers */}
         <Box width={"100%"} className='col-span-2 mt-[48px]'>
@@ -308,7 +308,7 @@ export default function TicketsPage(): ReactElement {
                         separated txt file.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 py-4">
+                    <Box className="grid gap-4 py-4">
                       <CodeEditor
                         value={code}
                         language="js"
@@ -323,7 +323,7 @@ export default function TicketsPage(): ReactElement {
                           height: 280,
                         }}
                       />
-                      <div>
+                      <Box>
                         <Label htmlFor="taskName" className="text-right">
                           Doc Name
                         </Label>
@@ -333,8 +333,8 @@ export default function TicketsPage(): ReactElement {
                           value={docName}
                           onChange={(e) => setDocName(e.target.value)}
                         />
-                      </div>
-                    </div>
+                      </Box>
+                    </Box>
                     <DialogFooter className='sm:justify-start'>
                       <Button type="submit" disabled={!docName || !code} onClick={addTicketToKnowledgeBase}>Save</Button>
                     </DialogFooter>
@@ -419,7 +419,7 @@ export default function TicketsPage(): ReactElement {
               {targetTicketMessages.map((message: TicketMessagesSchema, index: number) => {
                 return <MessageCard key={index} message={message} />;
               })}
-              <div ref={messagesContainerRef} />
+              <Box ref={messagesContainerRef} />
             </Box>
             <Box flexGrow={1} padding={"10px"} width={"100%"}>
               <CustomTextField addTicketResponseMessageApiHandler={addTicketResponseMessageApiHandler} ticketId={targetTicketMessages[0]?.ticketId} />
