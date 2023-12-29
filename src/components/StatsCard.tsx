@@ -15,7 +15,7 @@ export default function StatsCard({ statsName, statsIconPath, value, percentChan
       </CardHeader>
       <CardContent>
         <Box className='flex items-center justify-between' paddingY={"10px"}>
-          <Typography variant='h3'>{value}</Typography>
+          <Typography variant='h3' fontWeight={600}>{value}</Typography>
           {percentChange !== "none" ? (
             <Box className='flex items-center'>
               <p className={`mr-1 text-[14px]}`}>{percentChange}</p>

@@ -12,6 +12,7 @@ import { capitalizeFirstLetter } from "@/utils/general";
 import { navigationHandler } from "@/utils/nav";
 import { UserNavigation } from "@/components/navigation/UserNavigation";
 import { MainNavigation } from "@/components/navigation/MainNavigation";
+import Link from "next/link";
 
 // this layout is rendered for all pages navigation under the "/console"
 export default function ConsoleLayout({ children }: { children: ReactElement }): ReactElement {
@@ -63,8 +64,12 @@ export default function ConsoleLayout({ children }: { children: ReactElement }):
             </Box>
           </Box>
           {/* ------------------------------------------------------------------------------------------------------ */}
-          <Box className='min-h-[80vh]'>{children}</Box>
+          <Box className='min-h-[78vh]'>{children}</Box>
         </Box>
+      </Box>
+      <Box className={'flex justify-between items-center m-5 text-slate-500'}>
+        <Link href='mailto:dima.dimenko@assisterr.xyz'>support: dima.dimenko@assisterr.xyz</Link>
+        <p>assisterr v1.05</p>
       </Box>
     </Box>
   );
