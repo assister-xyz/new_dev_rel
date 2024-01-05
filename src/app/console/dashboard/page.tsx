@@ -14,9 +14,11 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {useToast} from "@/components/ui/use-toast";
 
 export default function DashboardPage(): ReactElement {
   const router: AppRouterInstance = useRouter();
+  const { toast } = useToast();
 
   const [period, setPeriod] = useState<string>("weekly");
 
@@ -27,8 +29,8 @@ export default function DashboardPage(): ReactElement {
   const [aiSuccessRateStatsCardStates, setAiSuccessRateStatsCardStates] = useState<StatsCardStatesInterface>({ value: "--", percentChange: "--" });
   const [timeSavedStatsCardStates, setTimeSavedStatsCardStates] = useState<StatsCardStatesInterface>({ value: "--", percentChange: "--" });
 
-  const [faqInsight, setFaqInsight] = useState<string>("");
-  const [faqInsightLoading, setFaqInsightLoading] = useState<boolean>(true);
+  // const [faqInsight, setFaqInsight] = useState<string>("");
+  // const [faqInsightLoading, setFaqInsightLoading] = useState<boolean>(true);
 
   // ------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,19 +42,13 @@ export default function DashboardPage(): ReactElement {
 
   useEffect(() => {
     async function getDashBoardStatsCardDataApiHandler(period: string, clientName: string): Promise<void> {
-      console.log("getDashBoardStatsCardDataApiHandler runs on Nav");
       try {
         const getResponse: Response = await getDashBoardStatsCardDataApi(period, clientName);
-        if (getResponse.ok === false) {
+        if (!getResponse.ok) {
           const responsePayload: { result: string } = await getResponse.json();
           throw new Error(responsePayload.result);
         }
-
-        // when no error, we process response payload then parse --> update all states using the response payload
-
         const responsePayload: { result: DashBoardDataSchema } = await getResponse.json();
-        console.log('responsePayload',responsePayload)
-
 
         setUserStatsCardStates({ value: responsePayload.result.current_period_unique_user_count, percentChange: responsePayload.result.unique_user_percent_change });
         setQueryStatsCardStates({ value: responsePayload.result.current_period_total_queries_count, percentChange: responsePayload.result.queries_percent_change });
@@ -65,7 +61,11 @@ export default function DashboardPage(): ReactElement {
         setTimeSavedStatsCardStates({ value: responsePayload.result.ai_time_saved, percentChange: "none" });
       } catch (error: unknown) {
         if (error instanceof Error) {
-          alert(error.message);
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: error.message,
+          })
         }
       }
     }
@@ -76,43 +76,43 @@ export default function DashboardPage(): ReactElement {
     }
   }, [period]);
 
-  useEffect(() => {
-    async function getDashBoardFAQInsightApiHandler(clientName: string): Promise<void> {
-      console.log("getDashBoardFAQInsightApiHandler runs on Nav");
-
-      try {
-        setFaqInsightLoading(true);
-        const getResponse: Response = await getDashBoardFAQInsightApi(clientName);
-
-        if (getResponse.ok === false) {
-          const responsePayload: { result: string } = await getResponse.json();
-          throw new Error(responsePayload.result);
-        }
-
-        const responsePayload: { result: string } = await getResponse.json();
-        setFaqInsight(responsePayload.result);
-        setFaqInsightLoading(false);
-      } catch (error: unknown) {
-        setFaqInsightLoading(false);
-        if (error instanceof Error) {
-          alert(error.message);
-        }
-      }
-    }
-
-    const clientName: string | null = localStorage.getItem("client");
-    if (clientName) {
-      getDashBoardFAQInsightApiHandler(clientName);
-    }
-  }, []);
+  // useEffect(() => {
+  //   async function getDashBoardFAQInsightApiHandler(clientName: string): Promise<void> {
+  //     try {
+  //       setFaqInsightLoading(true);
+  //       const getResponse: Response = await getDashBoardFAQInsightApi(clientName);
+  //
+  //       if (getResponse.ok === false) {
+  //         const responsePayload: { result: string } = await getResponse.json();
+  //         throw new Error(responsePayload.result);
+  //       }
+  //
+  //       const responsePayload: { result: string } = await getResponse.json();
+  //       setFaqInsight(responsePayload.result);
+  //       setFaqInsightLoading(false);
+  //     } catch (error: unknown) {
+  //       setFaqInsightLoading(false);
+  //       if (error instanceof Error) {
+  //         toast({
+  //           variant: "destructive",
+  //           title: "Uh oh! Something went wrong.",
+  //           description: error.message,
+  //         })
+  //       }
+  //     }
+  //   }
+  //
+  //   const clientName: string | null = localStorage.getItem("client");
+  //   if (clientName) {
+  //     getDashBoardFAQInsightApiHandler(clientName);
+  //   }
+  // }, []);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <Box className='flex-1 space-y-4 p-8 pt-6'>
       <Box className='flex items-center justify-between space-y-2'>
         <Typography variant='h1'>Dashboard</Typography>
-
-        {/* ------------------------------------------------------------------------------------------------------------------------------ */}
         {/* period selection */}
         <ToggleGroup type="single" value={period} onValueChange={periodToggleHandler}>
           <ToggleGroupItem value="weekly" aria-label="Toggle weekly">
@@ -123,10 +123,8 @@ export default function DashboardPage(): ReactElement {
           </ToggleGroupItem>
         </ToggleGroup>
       </Box>
-
       {/* ------------------------------------------------------------------------------------------------------------------------------ */}
       {/* top 4 stats card */}
-
       <Box className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <StatsCard statsName={"Unique users"} statsIconPath={"/logos/users.svg"} value={userStatsCardStates.value} percentChange={userStatsCardStates.percentChange} />
         <StatsCard statsName={"Queries"} statsIconPath={"/logos/queries.svg"} value={queryStatsCardStates.value} percentChange={queryStatsCardStates.percentChange} />
@@ -138,10 +136,8 @@ export default function DashboardPage(): ReactElement {
           percentChange={ticketResponseTimeStatsCardStates.percentChange}
         />
       </Box>
-
       {/* ------------------------------------------------------------------------------------------------------------------------------ */}
       {/* Bottom */}
-
       <Box className='grid gap-4 md:grid-cols-2 lg:grid-cols-6 grid-rows-3'>
         <Card className='col-span-3 row-span-full flex flex-col'>
           <CardHeader>

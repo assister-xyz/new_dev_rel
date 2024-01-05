@@ -1,4 +1,5 @@
 "use client";
+
 import React, { ReactElement, useEffect } from "react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Image from "next/image";
@@ -15,16 +16,13 @@ import { UserAuthForm } from "@/components/userAuthForm";
 
 export default function AuthPage(): ReactElement {
   const router: AppRouterInstance = useRouter();
-  // ------------------------------------------------------------------------------------------------------------------------------------------------
 
   useEffect(() => {
-    // if client is already logged in (if client name is stored in localstorage), we redirect him to the dashboard page directly by skipping the login page
     if (localStorage.getItem("client")) {
       navigationHandler("/console/dashboard", router);
     }
   }, []);
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <>
       <Box className="container relative h-[100vh] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">

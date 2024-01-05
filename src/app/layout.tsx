@@ -14,7 +14,6 @@ export default function RootLayout({ children }: { children: ReactElement }): Re
     typography: customTypography,
   });
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <StyledEngineProvider>
       <ThemeProvider theme={customTheme}>
