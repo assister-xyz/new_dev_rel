@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons'
 
 export default function KnowledgeBasePage(): ReactElement {
 	const { toast } = useToast();
@@ -53,6 +54,22 @@ export default function KnowledgeBasePage(): ReactElement {
 		});
 
 	// -----------------------------------------------------------------------------------------------------------------
+
+	const [totalPages, setTotalPages] = useState<number>(1);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [filesForPage, setFilesForPage] = useState<any>([]);
+
+	const goToPreviousPageHandler = () => {
+		setCurrentPage((prev: number) => prev > 1 ? prev - 1 : prev);
+	}
+
+	const goToNextPageHandler = () => {
+		setCurrentPage(prev => prev < totalPages ? prev + 1 : prev);
+	}
+
+	useEffect(() => {
+		setFilesForPage(filesData.slice((currentPage - 1) * 5, (currentPage - 1) * 5 + 5))
+	}, [currentPage])
 
 	function selectFileHandler(event: ChangeEvent<HTMLInputElement>): void {
 		const selectedFile = event.target.files?.[0];
@@ -130,8 +147,6 @@ export default function KnowledgeBasePage(): ReactElement {
 		id: string,
 		client: string
 	): Promise<void> {
-		console.log('deleteTargetFileHandler runs');
-
 		try {
 			const deleteResponse: Response = await deleteEmbeddedFileApi(id);
 			if (!deleteResponse.ok) {
@@ -149,7 +164,11 @@ export default function KnowledgeBasePage(): ReactElement {
 			setFilesData(responsePayload.result);
 		} catch (error: unknown) {
 			if (error instanceof Error) {
-				console.log(error.message);
+				toast({
+					variant: 'destructive',
+					title: 'Uh oh! Something went wrong.',
+					description: error.message,
+				});
 			}
 		}
 	}
@@ -168,7 +187,10 @@ export default function KnowledgeBasePage(): ReactElement {
 				}
 
 				const responsePayload: { result: EmbeddedFileStatesInterface[] } = await getResponse.json();
+				console.log(responsePayload.result.length)
+				setTotalPages(Math.ceil(responsePayload.result.length / 5))
 				setFilesData(responsePayload.result);
+				setFilesForPage(responsePayload.result.slice(0, 5))
 			} catch (error: unknown) {
 				if (error instanceof Error) {
 					console.log(error.message);
@@ -186,13 +208,30 @@ export default function KnowledgeBasePage(): ReactElement {
 			<Box className='flex items-center justify-between space-y-2'>
 				<h2 className='text-3xl font-bold tracking-tight'>Knowledge Base</h2>
 			</Box>
+			<div className='flex flex-row-reverse items-center justify-between px-2'>
+				<div className='flex items-center space-x-6 lg:space-x-8'>
+					<div className='flex w-[100px] items-center justify-center text-sm font-medium'>
+						Page { currentPage } of { totalPages }
+					</div>
+					<div className='flex items-center space-x-2'>
+						<Button variant='outline' className='h-8 w-8 p-0' onClick={goToPreviousPageHandler}>
+							<span className='sr-only'>Go to previous page</span>
+							<ChevronLeftIcon className='h-4 w-4' />
+						</Button>
+						<Button variant='outline' className='h-8 w-8 p-0' onClick={() => goToNextPageHandler()}>
+							<span className='sr-only'>Go to next page</span>
+							<ChevronRightIcon className='h-4 w-4' />
+						</Button>
+					</div>
+				</div>
+			</div>
 			<Box className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 				<AddFileCard
 					fileName={selectedFile?.name}
 					uploadAndEmbedFileHandler={uploadAndEmbedFileHandler}
 					selectFileHandler={selectFileHandler}
 				/>
-				{filesData.map((file: EmbeddedFileStatesInterface, index: number) => (
+				{filesForPage.map((file: EmbeddedFileStatesInterface, index: number) => (
 					<FileCard
 						key={index}
 						{...file}
@@ -201,7 +240,7 @@ export default function KnowledgeBasePage(): ReactElement {
 				))}
 			</Box>
 			<Box className='grid gap-6 grid-cols-2'>
-				<Card>
+				<Card className='col-span-2 md:col-span-1'>
 					<CardHeader className='space-y-0 pb-2'>
 						<CardTitle className='flex justify-between text-sm font-medium'>
 							Bot`s Performance
